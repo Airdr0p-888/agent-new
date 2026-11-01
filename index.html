@@ -21,7 +21,7 @@
 
 <header class="topbar">
   <div class="brand">
-    <div class="logo">BNCB</div>
+    <div class="logo" id="logoMark">BNCB</div>
     <div>
       <h1><span id="heroName">bncb人生</span> <span class="tag" id="heroSymbol">BNCB人生</span></h1>
       <p data-i18n="brand.sub">Agent ID 专属铸造 · BSC</p>
@@ -37,7 +37,7 @@
   <div class="hero-badge">
     <div class="hero-orb"></div>
     <img class="hero-mascot" src="assets/mascot.png" alt="BNCB" onerror="this.remove()" />
-    <span class="hero-badge-text">BNCB</span>
+    <span class="hero-badge-text" id="heroBadgeText">BNCB</span>
   </div>
   <h2 data-i18n-html="hero.title">持有币安 <em>Agent ID</em> 才能铸造</h2>
   <p data-i18n-html="hero.sub">
@@ -50,7 +50,7 @@
   </div>
   <div class="hero-cta">
     <a href="#mint" class="btn btn-primary" data-i18n="cta.mint">立即铸造</a>
-    <a href="https://bscscan.com/address/0xc65252a36433374deb9c62de014ca1c9bccd6b06" target="_blank" rel="noopener" class="btn btn-ghost" data-i18n="cta.scan">BscScan 核验</a>
+    <a href="https://bscscan.com/address/0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141" target="_blank" rel="noopener" class="btn btn-ghost" data-i18n="cta.scan">BscScan 核验</a>
   </div>
 </section>
 
@@ -82,7 +82,7 @@
   <div class="card">
     <div class="sec-head">
       <h3 data-i18n="sec.title">合约安全检测</h3>
-      <a class="btn btn-mini" href="https://bscscan.com/address/0xc65252a36433374deb9c62de014ca1c9bccd6b06" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
+      <a class="btn btn-mini" href="https://bscscan.com/address/0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
     </div>
     <div class="sec-top">
       <div class="sec-score">
@@ -91,7 +91,7 @@
         <small data-i18n="sec.badges">高危 0 · 中危 0 · 提示 2</small>
       </div>
       <div class="sec-rows">
-        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">BNCB人生</span> (<a id="secAddrLink" href="https://bscscan.com/address/0xc65252a36433374deb9c62de014ca1c9bccd6b06" target="_blank" rel="noopener">0xc652…d6b06</a>)</b></div>
+        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">BNCB人生</span> (<a id="secAddrLink" href="https://bscscan.com/address/0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141" target="_blank" rel="noopener">0x7fd5…2141</a>)</b></div>
         <div><span data-i18n="sec.creator">创建者 / 拥有者</span><b>0xF6…9423</b></div>
         <div><span data-i18n="sec.liquidity">开盘动作</span><b data-i18n="sec.liquidityV">等量代币 + 募集 USDT 注入 PancakeSwap V2 交易对</b></div>
       </div>
@@ -150,7 +150,7 @@
 
       <details class="adv">
         <summary data-i18n="adv.summary">高级：合约 / 代币参数</summary>
-        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0xc65252a36433374deb9c62de014ca1c9bccd6b06" /></div>
+        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141" /></div>
         <div class="field"><label data-i18n="label.usdt">USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
         <div class="field"><label data-i18n="label.nft">Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
       </details>

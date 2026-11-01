@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0xc65252a36433374deb9c62de014ca1c9bccd6b06",
+    CONTRACT: "0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
   };
@@ -568,6 +568,8 @@ If preview reports "execution reverted":
     document.querySelectorAll(".step .price").forEach((el) => (el.textContent = heroReady ? heroVals.price : "…"));
     if ($("heroName")) $("heroName").textContent = CHAIN_NAME;
     if ($("heroSymbol")) $("heroSymbol").textContent = CHAIN_SYMBOL;
+    if ($("logoMark")) { const m = $("logoMark"); m.textContent = CHAIN_SYMBOL; m.classList.toggle("logo-sm", CHAIN_SYMBOL.length > 4); }
+    if ($("heroBadgeText")) { const b = $("heroBadgeText"); b.textContent = CHAIN_SYMBOL; b.classList.toggle("logo-sm", CHAIN_SYMBOL.length > 4); }
   }
 
   // 用链上身份刷新 <title> / hero / 安全检测卡，并重渲染带占位符的文案

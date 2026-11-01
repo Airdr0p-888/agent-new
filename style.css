@@ -404,6 +404,8 @@ body::before {
   font-size: 11px; letter-spacing: .4px; white-space: nowrap;
   box-shadow: 0 0 18px rgba(255,122,24,.35);
 }
+/* 符号较长时缩小字号，避免撑出圆形徽标 */
+.logo.logo-sm, .hero-badge-text.logo-sm { font-size: 9px; letter-spacing: 0; }
 
 /* Hero 视觉徽标 */
 .hero-badge { position: relative; width: 96px; height: 96px; margin: 0 auto 22px; animation: orb-float 5s ease-in-out infinite; }
