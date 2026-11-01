@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="agent-wallet-api" content="https://agent-ai-agentic-wallet.onrender.com/api/agent-wallet" />
+<title>Agent人生 · Agent ID 专属铸造</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="glow"></div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span data-i18n="ticker.text">Mint 资金 100% 直接注入 LP 底池 · 买卖仅收 1% 税费，全部用于社区营销 · LP 自动锁仓至合约、永久锁定 · 合约零提取权限，安全透明无后门</span>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">AI</div>
+    <div>
+      <h1>Agent人生 <span class="tag">AGENT人生</span></h1>
+      <p data-i18n="brand.sub">Agent ID 专属铸造 · BSC</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="btn btn-ghost" href="whitepaper.html" data-i18n="nav.wp">白皮书</a>
+    <button id="langBtn" class="btn btn-ghost" title="中文 / English">EN</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h2 data-i18n-html="hero.title">持有币安 <em>Agent ID</em> 才能铸造</h2>
+  <p data-i18n-html="hero.sub">
+    下面填地址 → 自动检查资格 → 复制指令发给你的 AI 代理即可。
+  </p>
+</section>
+
+<main>
+  <!-- 连接状态 / 错误（常驻显示，方便排查） -->
+  <div id="connMsg" class="hint"></div>
+
+  <!-- 币安 AI 钱包（Agentic Wallet）铸造入口 -->
+  <div class="card card-ai">
+    <h3 data-i18n="ai.title">用币安 AI 钱包（Agentic Wallet）铸造</h3>
+    <ul class="notes">
+      <li data-i18n="ai.s1">本页填地址 → 选份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>。</li>
+      <li data-i18n="ai.s2">把指令发给你自己的 AI 代理（需已安装币安 Agentic Wallet 的 <code>baw</code> CLI 并开启 devMode）。</li>
+      <li data-i18n="ai.s3">代理会用你的 AI 钱包完成 approve + mint，每笔都会先 preview 并等你确认。</li>
+    </ul>
+    <p class="hint" data-i18n="ai.note">Agentic Wallet 是给 AI 代理用的钱包，没有网页连接接口，所以本页无法直接连接它 —— 与 jager.live 的做法一致：网页生成指令，AI 代理执行铸造。</p>
+  </div>
+
+  <!-- Mint 进度 -->
+  <div class="card prog">
+    <div class="prog-head">
+      <h3 data-i18n="prog.title">Mint 进度</h3>
+      <span class="status" id="prog_status" data-i18n="prog.loading">读取中…</span>
+    </div>
+    <div class="bar"><i id="prog_bar"></i></div>
+    <div class="prog-line">
+      <b id="prog_pct">0%</b>
+      <span id="prog_of" data-i18n="prog.loading">读取中…</span>
+    </div>
+    <ul class="prog-stats">
+      <li><span data-i18n="prog.raised">已募资</span><b id="prog_raised">—</b></li>
+      <li><span data-i18n="prog.supply">当前总供应</span><b id="prog_supply">—</b></li>
+      <li><span data-i18n="prog.left">剩余份数</span><b id="prog_left">—</b></li>
+      <li><span data-i18n="prog.deadline">截止时间</span><b id="prog_deadline">—</b></li>
+    </ul>
+  </div>
+
+  <!-- 合约安全检测（数据参考 AVE.ai 快照） -->
+  <div class="card">
+    <div class="sec-head">
+      <h3 data-i18n="sec.title">合约安全检测</h3>
+      <a class="btn btn-mini" href="https://bscscan.com/address/0x473dda08812c256da3685cc9d090e47224f3bb8d" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
+    </div>
+    <div class="sec-top">
+      <div class="sec-score">
+        <div class="sec-ring"><b>40</b></div>
+        <span data-i18n="sec.scoreLabel">风险评分</span>
+        <small data-i18n="sec.badges">高危 0 · 中危 0 · 提示 2</small>
+      </div>
+      <div class="sec-rows">
+        <div><span data-i18n="sec.contract">合约</span><b>AGENT人生 (<a href="https://bscscan.com/address/0x473dda08812c256da3685cc9d090e47224f3bb8d" target="_blank" rel="noopener">0x473d…3bb8d</a>)</b></div>
+        <div><span data-i18n="sec.creator">创建者 / 拥有者</span><b>0xF6…9423</b></div>
+        <div><span data-i18n="sec.liquidity">开盘动作</span><b data-i18n="sec.liquidityV">等量代币 + 募集 USDT 注入 PancakeSwap V2 交易对</b></div>
+      </div>
+    </div>
+    <h4 class="sec-sub" data-i18n="sec.summaryTitle">AI 概括</h4>
+    <p class="sec-summary" data-i18n="sec.summary">AGENT人生 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶。每份支付 PRICE 并获得 5,250 枚代币；开盘时，合约将等量代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 1% 手续费。</p>
+    <h4 class="sec-sub" data-i18n="sec.taxTitle">AI 税收检测</h4>
+    <ul class="sec-tax">
+      <li data-i18n="sec.t1">买入税：1%</li>
+      <li data-i18n="sec.t2">卖出税：1%</li>
+      <li data-i18n="sec.t3">转账税：0%</li>
+      <li data-i18n="sec.t4">单钱包最大量：每地址 10 份 mint shares；开盘后无持币上限</li>
+    </ul>
+    <p class="hint" data-i18n="sec.note">以上为 AVE.ai 合约检测参考快照；铸造前请在 BscScan 自行核验合约源码。</p>
+  </div>
+
+  <div class="grid">
+    <!-- 铸造区 -->
+    <div class="card">
+      <h3 data-i18n="card.mint">铸造区</h3>
+
+      <button id="connectBtn" class="btn btn-primary btn-lg" style="width:100%;margin:2px 0 16px" data-i18n="btn.connect">连接币安钱包</button>
+
+      <div class="field-row">
+        <div class="field">
+          <label data-i18n="label.count">铸造份数</label>
+          <div id="count" class="count-seg"></div>
+          <span class="hint" data-i18n="hint.count">选择要铸造的份数（1–10），生成 AI 指令后由你的 AI 钱包一次性完成授权与铸造</span>
+        </div>
+      </div>
+
+      <details class="adv">
+        <summary data-i18n="adv.summary">高级：合约 / 代币参数</summary>
+        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0x473dda08812c256da3685cc9d090e47224f3bb8d" /></div>
+        <div class="field"><label data-i18n="label.usdt">USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
+        <div class="field"><label data-i18n="label.nft">Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
+      </details>
+
+      <div class="btn-row">
+        <button id="genBtn" class="btn btn-primary btn-lg" data-i18n="btn.gen">生成 AI 指令</button>
+        <button id="mintBtn" class="btn btn-primary btn-lg">用币安 AI 钱包铸造</button>
+      </div>
+      <div id="wtx" class="hint"></div>
+    </div>
+
+    <!-- 指令区 -->
+    <div class="card card-accent">
+      <h3><span data-i18n="card.cmd">AI 指令</span><button id="copyBtn" class="btn btn-mini" data-i18n="btn.copy">复制</button></h3>
+      <textarea id="cmd" rows="18" data-i18n-ph="ph.cmd" placeholder="填好地址后点「生成 AI 指令」，这里会出现可直接粘贴给 AI 代理的完整指令"></textarea>
+      <p class="hint" data-i18n="hint.cmd">把这段指令粘到 Agentic Wallet 的 AI 对话里，它会逐步 preview 并等你确认。</p>
+    </div>
+  </div>
+
+  <!-- 使用说明 -->
+  <div class="card">
+    <h3 data-i18n="card.steps">让 AI 代理帮你铸造</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h4 data-i18n="s1.h">开启开发者模式</h4>
+        <p data-i18n="s1.p1">在币安 App 中，为你的 Agentic Wallet 开启开发者模式。</p>
+        <p class="path" data-i18n="s1.p2">Agentic Wallet → 设置 → 开发者模式</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h4 data-i18n="s2.h">检查资格</h4>
+        <p data-i18n="s2.p1">在上方铸造区输入你的 .ai 名称。这个地址需要有：</p>
+        <ul>
+          <li data-i18n="s2.l1">Agent ID</li>
+          <li><span data-i18n="s2.l2">每次</span> <span class="price">1</span> <span data-i18n="s2.l2b">USDT</span></li>
+          <li data-i18n="s2.l3">少量 BNB 付手续费</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h4 data-i18n="s3.h">发给你的 AI 代理</h4>
+        <p data-i18n="s3.p1">把指令粘贴到 Agentic Wallet 的 AI 对话里。每一步它都会先预览，等你确认后再执行。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent ID 申请教程 -->
+  <div class="card">
+    <h3 data-i18n="card.apply">如何申请 Agent ID</h3>
+    <div class="invite">
+      <div class="invite-txt">
+        <b data-i18n="invite.label">专属邀请链接</b>
+        <span>web3.binance.com/agent-id/aveai?src=user_share</span>
+      </div>
+      <a class="btn btn-primary" href="https://web3.binance.com/agent-id/aveai?src=user_share" target="_blank" rel="noopener" data-i18n="invite.go">去注册</a>
+      <button class="btn btn-ghost" data-copy="https://web3.binance.com/agent-id/aveai?src=user_share" data-i18n="invite.copy">复制链接</button>
+    </div>
+    <div class="steps steps-4">
+      <div class="step">
+        <div class="num">01</div>
+        <h4 data-i18n="a1.h">打开邀请链接</h4>
+        <p data-i18n="a1.p">用币安 App 扫码，或在币安 Web3 钱包内置浏览器打开，进入 Agent ID 页面。</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h4 data-i18n="a2.h">连接 / 创建 Agentic Wallet</h4>
+        <p data-i18n="a2.p">钱包里预留一点 BNB 付网络手续费。</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h4 data-i18n="a3.h">选 .ai 名称并提交</h4>
+        <p data-i18n="a3.p">按页面提示完成注册；是否仍需邀请名额，以官方页面显示为准。</p>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <h4 data-i18n="a4.h">回来检查资格</h4>
+        <p data-i18n="a4.p">Agent ID 到账后，在上方铸造区填地址点「检查资格」，显示持有 ≥ 1 即可铸造。</p>
+      </div>
+    </div>
+    <p class="hint" data-i18n="apply.note">注册流程与名额以币安官方页面为准，可能随时调整。</p>
+  </div>
+
+  <!-- 社区与推广入口 -->
+  <div class="card">
+    <h3 data-i18n="card.social">社区与推广入口</h3>
+    <div class="promo">
+      <a href="https://web3.binance.com/agent-id/aveai?src=user_share" target="_blank" rel="noopener">
+        <i class="ic ic-ai">ID</i><b data-i18n="p1.b">Agent ID 邀请</b><span data-i18n="p1.s">注册领取 Agent ID</span>
+      </a>
+      <a href="https://t.me/AgentAiID" target="_blank" rel="noopener">
+        <i class="ic ic-tg">TG</i><b data-i18n="p2.b">Telegram</b><span data-i18n="p2.s">电报社群</span>
+      </a>
+      <a href="https://x.com/piaHxo71o93774" target="_blank" rel="noopener">
+        <i class="ic ic-x">X</i><b data-i18n="p3.b">X / Twitter</b><span data-i18n="p3.s">官方推特</span>
+      </a>
+      <a href="https://m.debox.pro/group?id=df4tbv24&code=nsv436ap" target="_blank" rel="noopener">
+        <i class="ic ic-db">DB</i><b data-i18n="p4.b">Debox</b><span data-i18n="p4.s">Debox 社群</span>
+      </a>
+    </div>
+    <p class="hint" data-i18n="social.note">搜索「请替换」即可找到待填链接；把 Telegram / X / Debox 三个换成你自己的地址。</p>
+  </div>
+
+  <div class="card card-warn">
+    <h3 data-i18n="card.warn">注意</h3>
+    <ul class="notes">
+      <li data-i18n-html="w1">开盘前铸造到的 Agent人生 <b>不可转账</b>，需等开盘后才能交易。</li>
+      <li data-i18n="w2">每笔交易 AI 都会先 preview，请逐笔看清解析结果与风险再确认。</li>
+      <li data-i18n="w3">本页只做地址填写与指令生成，不托管私钥、不代发交易。</li>
+    </ul>
+  </div>
+</main>
+
+<footer data-i18n="footer">Agent人生 · AGENT人生 — 本页不托管资产，请自行核对合约地址 · <a href="whitepaper.html" data-i18n="nav.wp">白皮书</a></footer>
+
+<div id="toast"></div>
+
+<!-- 币安 AI 钱包扫码登录弹层 -->
+<div id="qrModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>连接币安 AI 钱包</h3>
+    <div id="qrBox" class="qr"></div>
+    <p class="hint">配对码：<b id="awPair">——</b></p>
+    <p id="qrMode" class="hint"></p>
+    <a id="wcOpen" class="btn btn-primary" href="#" target="_blank" rel="noopener">打开币安 App</a>
+    <p id="awWait" class="hint"></p>
+    <span id="awBadge" class="badge"></span>
+    <div style="margin-top:14px"><button id="qrCancel" class="btn btn-ghost">取消</button></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<!-- WalletConnect v2 + 二维码（本地打包，无第三方依赖） -->
+<script src="vendor/wc.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

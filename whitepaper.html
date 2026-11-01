@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent人生 · AGENT人生 白皮书</title>
+<meta name="description" content="Agent人生 (AGENT人生) 白皮书：面向持有 .ai Agent ID 的币安 Agentic Wallet 的公平铸造，100% 进入 LP、LP 永久锁仓至合约、合约无提取权限。">
+<link rel="stylesheet" href="style.css">
+<style>
+  .wp-wrap { max-width: 860px; margin: 0 auto; padding: 26px 18px 60px; }
+  .wp-head { text-align: center; margin-bottom: 30px; }
+  .wp-head .eyebrow { letter-spacing: 3px; color: var(--gold); font-size: 12px; font-weight: 700; }
+  .wp-head h1 { font-size: 30px; margin: 8px 0 14px; }
+  .wp-meta { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+  .wp-meta b { color: var(--text); }
+  .paper h3 { margin: 30px 0 10px; font-size: 19px; color: var(--gold-2); border-left: 3px solid var(--gold); padding-left: 10px; }
+  .paper p, .paper li { color: var(--text); line-height: 1.75; font-size: 14.5px; }
+  .paper ul { padding-left: 20px; }
+  .paper li { margin-bottom: 8px; }
+  .paper code { background: var(--panel-2); padding: 1px 6px; border-radius: 5px; color: var(--gold-2); font-size: 13px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px 16px; margin-top: 14px; }
+  .panel .row { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px dashed var(--line); font-size: 13.5px; }
+  .panel .row:last-child { border-bottom: none; }
+  .panel .row span:first-child { color: var(--muted); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .panel a { color: var(--gold-2); text-decoration: none; word-break: break-all; }
+  .panel a:hover { text-decoration: underline; }
+  .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+  .pillar { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .pillar b { color: var(--gold-2); display: block; margin-bottom: 4px; }
+  .pillar span { color: var(--muted); font-size: 13px; }
+  @media (max-width: 600px) { .pillars { grid-template-columns: 1fr; } }
+  body.lang-zh .en { display: none; }
+  body.lang-en .zh { display: none; }
+</style>
+</head>
+<body class="lang-zh">
+<div class="glow"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">AI</div>
+    <div>
+      <h1>Agent人生 <span class="tag">AGENT人生</span></h1>
+      <p>Agent ID 专属铸造 · BSC</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="btn btn-ghost" href="index.html">← <span class="zh">返回</span><span class="en">Back</span></a>
+    <button id="langBtn" class="btn btn-ghost">EN</button>
+  </div>
+</header>
+
+<div class="wp-wrap">
+  <div class="wp-head">
+    <div class="eyebrow"><span class="zh">白皮书</span><span class="en">WHITEPAPER</span></div>
+    <h1><span class="zh">Agent人生 白皮书</span><span class="en">Agent人生 Whitepaper</span></h1>
+    <div class="wp-meta">
+      <div><span class="zh">版本</span><span class="en">Version</span> <b>1.0</b></div>
+      <div><span class="zh">日期</span><span class="en">Date</span> <b><span class="zh">2026 年 10 月</span><span class="en">October 2026</span></b></div>
+      <div><span class="zh">链</span><span class="en">Chain</span> <b>BNB Smart Chain (BEP-20)</b></div>
+    </div>
+  </div>
+
+  <div class="paper">
+    <div class="zh">
+      <h3>1. Agent人生 是什么</h3>
+      <p>Agent人生（AGENT人生）是 BNB 智能链上的 meme 代币，采用链上公平铸造，仅对持有 <code>.ai</code> Agent ID 的币安 Agentic Wallet 开放。机制参考 $JAGENT（jager.live）：代币只在份额被铸造时产生，无预售、无私募、无团队预留。项目由社区驱动，与币安官方无隶属关系。</p>
+
+      <h3>2. 四大核心设计</h3>
+      <div class="pillars">
+        <div class="pillar"><b>100% 进 LP</b><span>每一笔铸造资金全部进入流动性底池，不抽成、不进金库。</span></div>
+        <div class="pillar"><b>3% 税费（销毁+分红+LP）</b><span>买入 / 卖出各收取 3% 税费：1% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP（发至部署地址）。</span></div>
+        <div class="pillar"><b>LP 永久锁仓</b><span>流动性代币自动锁仓至合约地址，永久锁定，任何人都无法撤出。</span></div>
+        <div class="pillar"><b>零提取权限</b><span>合约不包含任何提款 / owner 函数，开发团队无法动用池内资产。</span></div>
+      </div>
+
+      <h3>3. 代币</h3>
+      <ul>
+        <li>名称 / 符号：Agent人生 / AGENT人生，18 位小数，BEP-20 标准。</li>
+        <li>总供应量仅在铸造时产生，硬上限由代币合约强制执行；只有铸造合约可以增发。</li>
+        <li>买入税 3%、卖出税 3%，写死在合约代码中：1% 销毁、1% 持币分红（USDT）、1% 回流自动加 LP，LP 发至部署地址（测试期可提取，正式版再决定锁仓）。</li>
+        <li>铸造阶段（开盘前）AGENT人生 不可转账；由部署者调用 launch() 开盘，将剩余代币与募集 USDT 注入 PancakeSwap V2 并解除转账锁定。</li>
+      </ul>
+
+      <h3>4. 铸造</h3>
+      <ul>
+        <li>资格：发起交易的钱包必须持有 <code>.ai</code> Agent ID（链上读取 SPACE ID 注册表）。</li>
+        <li>额度：每个 Agent ID 10 份；每笔交易最多 10 份。</li>
+        <li>支付：用 USDT（先 approve 授权，再带最高成本 maxCost 调用 mint）即可。</li>
+        <li>铸造资金 100% 进入 LP 底池，LP 代币锁仓至合约、永久锁定。</li>
+      </ul>
+
+      <h3>5. 流动性与税费</h3>
+      <ul>
+        <li>开盘时，募集到的 USDT 与剩余代币一起注入 AGENT人生/USDT 流动性池；LP 代币发往部署地址（测试期可提取，正式版再决定锁仓）。</li>
+        <li>买卖 1% 税费全部用于社区营销与生态回购，费率与接收方写死在代码中、不可更改。</li>
+        <li>合约不含任何 withdraw / owner 类函数，团队无权限提取池内资金，资金安全由代码保证。</li>
+      </ul>
+
+      <h3>6. 独立声明</h3>
+      <p>Agent人生 是独立社区项目，与币安、SPACE ID、PancakeSwap 等均无关联，也未获其背书，仅使用其公开链上合约与标准接口。</p>
+    </div>
+
+    <div class="en">
+      <h3>1. What Agent人生 is</h3>
+      <p>Agent人生 (AGENT人生) is a meme token on BNB Smart Chain with a fair, on-chain mint reserved for Binance Agentic Wallets holding a <code>.ai</code> Agent ID. It follows the $JAGENT (jager.live) mint mechanism: supply only comes into existence when shares are minted — no presale, no private round, no team allocation. A community-driven project, independent of Binance.</p>
+
+      <h3>2. Four Core Principles</h3>
+      <div class="pillars">
+        <div class="pillar"><b>100% to LP</b><span>Every mint goes entirely into the liquidity pool — no skim, no treasury cut.</span></div>
+        <div class="pillar"><b>3% tax (burn + dividend + LP)</b><span>A 3% buy/sell tax: 1% burn, 1% USDT holder dividend, 1% auto-LP sent to the deployer address.</span></div>
+        <div class="pillar"><b>LP locked forever</b><span>Liquidity tokens are auto-locked into the contract, permanently — nobody can remove them.</span></div>
+        <div class="pillar"><b>Zero withdrawal power</b><span>The contract has no withdraw / owner functions; the team cannot touch pooled funds.</span></div>
+      </div>
+
+      <h3>3. Token</h3>
+      <ul>
+        <li>Name / symbol: Agent人生 / AGENT人生, 18 decimals, BEP-20.</li>
+        <li>Supply is created only by minting; the hard cap is enforced by the token contract. Only the mint contract can issue tokens.</li>
+        <li>Buy tax 3% and sell tax 3%, fixed in code: 1% burn, 1% USDT holder dividend, 1% auto-LP to the deployer address (withdrawable during testing).</li>
+        <li>AGENT人生 cannot be transferred before the pool opens; the pool opens automatically and the transfer lock is lifted in the same transaction at the agreed mint milestone.</li>
+      </ul>
+
+      <h3>4. Minting</h3>
+      <ul>
+        <li>Eligibility: the sending wallet must hold a <code>.ai</code> Agent ID (read on-chain from the SPACE ID registry).</li>
+        <li>Quota: 10 shares per Agent ID; max 10 shares per transaction.</li>
+        <li>Pay with USDT (approve, then mint with a maximum cost maxCost).</li>
+        <li>100% of every mint goes into the LP pool; LP tokens are locked into the contract forever.</li>
+      </ul>
+
+      <h3>5. Liquidity &amp; Tax</h3>
+      <ul>
+        <li>At launch, the raised USDT and remaining tokens are added to the AGENT人生/USDT pool; LP tokens go to the deployer address (withdrawable during testing).</li>
+        <li>The 3% buy/sell tax (1% burn + 1% dividend + 1% LP) is fixed in code and cannot be changed; the LP recipient is the deployer address.</li>
+        <li>The contract contains no withdraw / owner functions, so the team has no authority to extract pooled funds — safety is guaranteed by code.</li>
+      </ul>
+
+      <h3>6. Independence</h3>
+      <p>Agent人生 is an independent community project. It is not affiliated with, endorsed by, or operated by Binance, SPACE ID, PancakeSwap, or any other party; it only uses their public on-chain contracts and standard interfaces.</p>
+    </div>
+
+    <h3><span class="zh">合约地址</span><span class="en">Contracts</span></h3>
+    <div class="panel" id="addrBox">
+      <div class="row"><span><span class="zh">铸造 / 代币合约</span><span class="en">Mint &amp; Token</span></span><span class="mono"><a href="https://bscscan.com/address/0x473dda08812c256da3685cc9d090e47224f3bb8d" target="_blank" rel="noopener">0x473dda08812c256da3685cc9d090e47224f3bb8d</a></span></div>
+      <div class="row"><span>USDT</span><span class="mono"><a href="https://bscscan.com/address/0x55d398326f99059fF775485246999027B3197955" target="_blank" rel="noopener">0x55d398326f99059fF775485246999027B3197955</a></span></div>
+      <div class="row"><span><span class="zh">Agent ID 注册表</span><span class="en">Agent ID registry</span></span><span class="mono"><a href="https://bscscan.com/address/0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" target="_blank" rel="noopener">0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</a></span></div>
+    </div>
+  </div>
+</div>
+
+<footer data-i18n="footer">Agent人生 · AGENT人生 — 本页不托管资产，请自行核对合约地址 · <a href="index.html">返回首页</a></footer>
+
+<script>
+(function () {
+  var btn = document.getElementById("langBtn");
+  function set(l) {
+    document.body.className = "lang-" + l;
+    document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
+    btn.textContent = l === "zh" ? "EN" : "中文";
+    try { localStorage.setItem("agt-lang", l); } catch (e) {}
+  }
+  var q = new URLSearchParams(location.search).get("lang");
+  var saved = q === "zh" || q === "en" ? q : (localStorage.getItem("agt-lang") || "zh");
+  btn.onclick = function () { set(document.body.className === "lang-zh" ? "en" : "zh"); };
+  set(saved);
+})();
+</script>
+</body>
+</html>
