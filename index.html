@@ -41,16 +41,6 @@
   <!-- 连接状态 / 错误（常驻显示，方便排查） -->
   <div id="connMsg" class="hint"></div>
 
-  <!-- 币安 AI 钱包（Agentic Wallet）铸造入口 -->
-  <div class="card card-ai">
-    <h3 data-i18n="ai.title">用币安 AI 钱包（Agentic Wallet）铸造</h3>
-    <ul class="notes">
-      <li data-i18n="ai.s1">本页填地址 → 选份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>。</li>
-      <li data-i18n="ai.s2">把指令发给你自己的 AI 代理（需已安装币安 Agentic Wallet 的 <code>baw</code> CLI 并开启 devMode）。</li>
-      <li data-i18n="ai.s3">代理会用你的 AI 钱包完成 approve + mint，每笔都会先 preview 并等你确认。</li>
-    </ul>
-    <p class="hint" data-i18n="ai.note">Agentic Wallet 是给 AI 代理用的钱包，没有网页连接接口，所以本页无法直接连接它 —— 与 jager.live 的做法一致：网页生成指令，AI 代理执行铸造。</p>
-  </div>
 
   <!-- Mint 进度 -->
   <div class="card prog">
@@ -108,6 +98,22 @@
 
       <button id="connectBtn" class="btn btn-primary btn-lg" style="width:100%;margin:2px 0 16px" data-i18n="btn.connect">连接币安钱包</button>
 
+      <div id="walletPanel" style="margin:4px 0 16px;padding:12px 14px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.04);">
+        <p id="wpHint" class="hint" data-i18n="wp.hint">连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可 Mint 次数。</p>
+        <div id="wpBody" class="hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;"><span data-i18n="wp.addr">已连接钱包</span><b id="wpAddr"></b></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;"><span data-i18n="wp.left">剩余可 Mint</span><b id="wpLeft">—</b></div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.18);">
+            <b data-i18n="wp.promoLabel">我的推广链接</b>
+            <p class="hint" style="margin:6px 0 0" data-i18n="wp.promoHint">分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份</p>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <input id="wpLink" readonly style="flex:1;min-width:0;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:#e8eaf0;font-size:12px;" />
+              <button id="wpCopy" class="btn btn-mini" data-i18n="wp.copy">复制</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="field-row">
         <div class="field">
           <label data-i18n="label.count">铸造份数</label>
@@ -136,6 +142,17 @@
       <textarea id="cmd" rows="18" data-i18n-ph="ph.cmd" placeholder="填好地址后点「生成 AI 指令」，这里会出现可直接粘贴给 AI 代理的完整指令"></textarea>
       <p class="hint" data-i18n="hint.cmd">把这段指令粘到 Agentic Wallet 的 AI 对话里，它会逐步 preview 并等你确认。</p>
     </div>
+  </div>
+
+  <!-- 币安 AI 钱包（Agentic Wallet）铸造说明（移至铸造区 / AI 指令下方） -->
+  <div class="card card-ai">
+    <h3 data-i18n="ai.title">用币安 AI 钱包（Agentic Wallet）铸造</h3>
+    <ul class="notes">
+      <li data-i18n-html="ai.s1">选好份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>到剪贴板，直接粘贴给 AI 即可。</li>
+      <li data-i18n-html="ai.s2">把指令发给你自己的 AI 代理（需已安装币安 Agentic Wallet 的 <code>baw</code> CLI 并开启 devMode）。</li>
+      <li data-i18n-html="ai.s3">代理会用你的 AI 钱包完成 approve + mint，每笔都会先 preview 并等你确认。</li>
+    </ul>
+    <p class="hint" data-i18n-html="ai.note">本页支持两种铸造方式：① 在上方铸造区点「连接币安钱包」直接铸造（扫码 → 在币安 App 内确认）；② 或点「生成 AI 指令」交给 AI 代理执行。Agentic Wallet 是给 AI 代理用的钱包，没有网页直连接口，因此方式②由网页生成指令、AI 代理执行，与 jager.live 做法一致。</p>
   </div>
 
   <!-- 使用说明 -->

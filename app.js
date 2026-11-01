@@ -143,6 +143,9 @@
       "s3.h": "发给你的 AI 代理", "s3.p1": "把指令粘贴到 Agentic Wallet 的 AI 对话里。每一步它都会先预览，等你确认后再执行。",
       "card.apply": "如何申请 Agent ID",
       "invite.label": "专属邀请链接", "invite.go": "去注册", "invite.copy": "复制链接",
+      "wp.addr": "已连接钱包", "wp.left": "剩余可 Mint", "wp.promoLabel": "我的推广链接",
+      "wp.promoHint": "分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份", "wp.copy": "复制",
+      "wp.hint": "连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可 Mint 次数。",
       "a1.h": "打开邀请链接", "a1.p": "用币安 App 扫码，或在币安 Web3 钱包内置浏览器打开，进入 Agent ID 页面。",
       "a2.h": "连接 / 创建 Agentic Wallet", "a2.p": "钱包里预留一点 BNB 付网络手续费。",
       "a3.h": "选 .ai 名称并提交", "a3.p": "按页面提示完成注册；是否仍需邀请名额，以官方页面显示为准。",
@@ -196,10 +199,10 @@
       "t.genFirst": "请先生成指令",
       "t.genCopied": "指令已复制，发给你的 AI 代理即可",
       "ai.title": "用币安 AI 钱包（Agentic Wallet）铸造",
-      "ai.s1": "选好份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>。",
+      "ai.s1": "选好份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>到剪贴板，直接粘贴给 AI 即可。",
       "ai.s2": "把指令发给你自己的 AI 代理（需已安装币安 Agentic Wallet 的 <code>baw</code> CLI 并开启 devMode）。",
       "ai.s3": "代理会用你的 AI 钱包完成 approve + mint，每笔都会先 preview 并等你确认。",
-      "ai.note": "本页支持两种方式：① 在铸造区点「连接币安钱包」直接铸造（扫码 → 在币安 App 确认）；② 或点「生成 AI 指令」交给 AI 代理执行。",
+      "ai.note": "本页支持两种铸造方式：① 在上方铸造区点「连接币安钱包」直接铸造（扫码 → 在币安 App 内确认）；② 或点「生成 AI 指令」交给 AI 代理执行。Agentic Wallet 是给 AI 代理用的钱包，没有网页直连接口，因此方式②由网页生成指令、AI 代理执行，与 jager.live 做法一致。",
       "sec.title": "合约安全检测",
       "sec.verify": "BscScan 核验",
       "sec.scoreLabel": "风险评分",
@@ -364,6 +367,9 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "s3.h": "Send it to your AI agent", "s3.p1": "Paste the command into your Agentic Wallet AI chat. It previews each step and waits for your confirmation.",
       "card.apply": "How to Apply for Agent ID",
       "invite.label": "Exclusive invite link", "invite.go": "Register", "invite.copy": "Copy link",
+      "wp.addr": "Connected wallet", "wp.left": "Mint quota left", "wp.promoLabel": "My referral link",
+      "wp.promoHint": "Share this link — friends who mint via it add +1 to your mint quota per referred minter", "wp.copy": "Copy",
+      "wp.hint": "After connecting your wallet, your exclusive referral link (?ref=your address) is generated here, and your remaining mint quota is shown.",
       "a1.h": "Open the invite link", "a1.p": "Scan with the Binance App or open it in the Binance Web3 wallet browser to reach the Agent ID page.",
       "a2.h": "Connect / create Agentic Wallet", "a2.p": "Keep a little BNB in the wallet for gas.",
       "a3.h": "Pick your .ai name and submit", "a3.p": "Follow the page instructions; whether an invite slot is still required follows the official page.",
@@ -418,10 +424,10 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "t.genFirst": "Generate the command first",
       "t.genCopied": "Command copied — paste it to your AI agent",
       "ai.title": "Mint with Binance Agentic Wallet (AI wallet)",
-      "ai.s1": "Pick the share count → press \"Generate AI command\" — it is <b>copied automatically</b>.",
+      "ai.s1": "Pick the share count → press \"Generate AI command\" — the full command is <b>copied automatically</b> to your clipboard, just paste it to your AI.",
       "ai.s2": "Send the command to your own AI agent (Binance Agentic Wallet <code>baw</code> CLI installed, devMode enabled).",
       "ai.s3": "The agent approves and mints with your AI wallet, previewing every transaction and waiting for your confirmation.",
-      "ai.note": "Two ways supported: ① click \"Connect Binance Wallet\" in the mint box to mint directly with your Binance AI wallet (scan QR → confirm in the Binance App); ② or \"Generate AI command\" to let your AI agent mint.",
+      "ai.note": "Two mint ways: ① click \"Connect Binance Wallet\" in the mint box above to mint directly (scan QR → confirm in the Binance App); ② or \"Generate AI command\" to let your AI agent mint. Agentic Wallet has no web-connect interface, so way ② works as: page generates the command, AI agent executes — same as jager.live.",
       "sec.title": "Contract Security Check",
       "sec.verify": "Verify on BscScan",
       "sec.scoreLabel": "Risk score",
@@ -1149,6 +1155,38 @@ If preview reports "execution reverted":
     resolved = { addr, name: null };
     const cb = $("connectBtn");
     if (cb) cb.textContent = shortAddr(addr);
+    refreshWallet();
+  }
+
+  // 连接钱包后展示：剩余可 Mint 次数（基础 + 推广）与专属推广链接
+  async function refreshWallet() {
+    if (!account) return;
+    const panel = $("walletPanel");
+    if (panel) panel.classList.remove("hidden");
+    const body = $("wpBody");
+    if (body) body.classList.remove("hidden");
+    const hint = $("wpHint");
+    if (hint) hint.classList.add("hidden");
+    const addrEl = $("wpAddr");
+    if (addrEl) addrEl.textContent = shortAddr(account);
+    const link = location.origin + location.pathname + "?ref=" + account;
+    const linkEl = $("wpLink");
+    if (linkEl) linkEl.value = link;
+    const leftEl = $("wpLeft");
+    try {
+      const i = info || (await loadInfo());
+      const [minted, refBonus] = await Promise.all([
+        i.c.mintedShares(account), i.c.referralBonus(account),
+      ]);
+      const base = Number(i.maxPerWallet);
+      const userMax = base + Number(refBonus);
+      const left = Math.max(0, userMax - Number(minted));
+      if (leftEl) leftEl.textContent = LANG === "zh"
+        ? left + " 次（基础 " + base + " + 推广 " + Number(refBonus) + "）"
+        : left + " (base " + base + " + referral " + Number(refBonus) + ")";
+    } catch (e) {
+      if (leftEl) leftEl.textContent = "—";
+    }
   }
 
   let lastUri = ""; // 最近一次 WC 连接串，用于「打开币安 App」按钮
@@ -1511,6 +1549,12 @@ If preview reports "execution reverted":
   $("genBtn").addEventListener("click", generate);
   $("copyBtn").addEventListener("click", copyCmd);
   $("mintBtn").addEventListener("click", mintWithWallet);
+  if ($("wpCopy")) $("wpCopy").addEventListener("click", async () => {
+    const linkEl = $("wpLink");
+    if (!linkEl) return;
+    try { await navigator.clipboard.writeText(linkEl.value); toast(t("t.copyLink"), "ok"); }
+    catch { toast(t("t.copyLinkFail"), "err"); }
+  });
 
   // 合约地址支持 URL 参数 ?contract=0x... 动态指定（覆盖源码默认值，部署新合约免改源码）
   try {
