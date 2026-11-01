@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x7fd5fcd70e99d0efc9f659eb30e929c5e1c12141",
+    CONTRACT: "0xf8082df71b910eb01fc811d4c7678431737a0cbf",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
   };
