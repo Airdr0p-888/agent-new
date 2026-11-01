@@ -230,6 +230,22 @@
       <li data-i18n="w3">本页只做地址填写与指令生成，不托管私钥、不代发交易。</li>
     </ul>
   </div>
+
+  <!-- 卖币：直接走 Pancake fee-on-transfer 兼容方法，避免普通 swap 的 K 值失败（卖出收税必现） -->
+  <div class="card" id="sellCard">
+    <h2 data-i18n="sell.title">卖币（Sell）</h2>
+    <p class="hint" data-i18n="sell.hint">卖出走 Pancake 兼容方法，不用去外部 DEX。需先连接币安钱包。</p>
+    <button id="sellConnect" class="btn btn-ghost btn-block">连接钱包</button>
+    <div class="field"><label data-i18n="sell.bal">你的持仓</label><input id="sellBal" disabled placeholder="连接后自动读取" /></div>
+    <div class="field-row">
+      <div class="field"><label data-i18n="sell.amt">卖出数量</label><input id="sellAmt" type="number" placeholder="0" /></div>
+      <button id="sellMax" class="btn btn-mini" data-i18n="sell.max">MAX</button>
+    </div>
+    <div class="field"><label data-i18n="sell.slip">滑点（%）</label><input id="sellSlip" type="number" value="5" /></div>
+    <button id="sellBtn" class="btn btn-primary btn-block" data-i18n="sell.btn">卖出 {sym}</button>
+    <a id="al_panLink" class="btn btn-ghost btn-block" target="_blank" rel="noopener" data-i18n="sell.pancake">在 PancakeSwap 卖币（普通钱包）</a>
+    <div id="sellt" class="txinfo"></div>
+  </div>
 </main>
 
 <footer data-i18n="footer">{name} · {sym} — 本页不托管资产，请自行核对合约地址 · <a href="whitepaper.html" data-i18n="nav.wp">白皮书</a></footer>

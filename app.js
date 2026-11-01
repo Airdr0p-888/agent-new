@@ -131,6 +131,10 @@
       "adv.summary": "高级：合约 / 代币参数",
       "label.contract": "合约地址", "label.usdt": "USDT 合约", "label.nft": "Agent ID NFT",
       "nav.wp": "白皮书",
+      "sell.title": "卖币（Sell）", "sell.hint": "卖出走 Pancake fee-on-transfer 兼容方法（外部 DEX/钱包普通兑换因收税会失败，请用本按钮）。需先连接币安钱包。",
+      "sell.bal": "你的持仓", "sell.amt": "卖出数量", "sell.max": "MAX", "sell.slip": "滑点（%）", "sell.btn": "卖出 {sym}",
+      "sell.needAmt": "请输入卖出数量", "sell.exceed": "超出你的余额", "sell.routeFail": "路由查询失败（可能未开盘/无池）",
+      "sell.selling": "卖出交易已提交…", "sell.ok": "卖出成功", "sell.tx": "卖出", "sell.pancake": "在 PancakeSwap 卖币（普通钱包）",
       "btn.check": "检查资格", "btn.gen": "生成 AI 指令",
       "card.cmd": "AI 指令", "btn.copy": "复制",
       "ph.cmd": "选好份数后点「生成 AI 指令」，这里会出现可直接粘贴给 AI 代理的完整指令",
@@ -381,6 +385,10 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "w3": "This page only builds the command. It never holds your keys or sends transactions for you.",
       "footer": "{name} · {sym} — this page does not custody assets; always verify the contract address",
       "nav.wp": "Whitepaper",
+      "sell.title": "Sell", "sell.hint": "Uses Pancake fee-on-transfer compatible method. External DEXs/wallets may fail on this taxed token (use this button). Connect your Binance wallet first.",
+      "sell.bal": "Your balance", "sell.amt": "Amount to sell", "sell.max": "MAX", "sell.slip": "Slippage (%)", "sell.btn": "Sell {sym}",
+      "sell.needAmt": "Enter amount", "sell.exceed": "Exceeds your balance", "sell.routeFail": "Route lookup failed (not launched / no pool?)",
+      "sell.selling": "Sell tx submitted…", "sell.ok": "Sold", "sell.tx": "Sell", "sell.pancake": "Sell on PancakeSwap (any wallet)",
 
       "el.addr": "Address",
       "el.name": "Agent ID name {n}", "el.resolved": "resolved to the address above",
@@ -727,6 +735,8 @@ If preview reports "execution reverted":
     saveHeroCache(info.contract, heroVals);
     paintHero();
     paintIdentity();
+    updatePancakeLink();
+    if (account) refreshSellBal();
     $("usdt").value = await info.u.getAddress();
     $("nft").value = nft;
     updateProgress();
@@ -1372,6 +1382,118 @@ If preview reports "execution reverted":
   // 取消按钮不能用内联 onclick（app.js 是 IIFE，closeQr 不是全局函数），必须在这里绑定
   const _qrCancel = $("qrCancel");
   if (_qrCancel) _qrCancel.addEventListener("click", closeQr);
+
+  // 卖币：Pancake 兼容方法（swapExactTokensForTokensSupportingFeeOnTransferTokens），避免普通 swap 的 fee-on-transfer K 值失败
+  const PANCAKE = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+
+  async function refreshSellBal() {
+    if (!info || !account) return;
+    try { const b = await info.c.balanceOf(account); const el = $("sellBal"); if (el) el.value = ethers.formatUnits(b, 18); } catch {}
+  }
+
+  async function doSell() {
+    const stx = $("sellt");
+    const fail = (m) => { toast(m, "err"); if (stx) stx.innerHTML = `<span class="err">${m}</span>`; };
+    // 先读卖出数量（必须在任何 await 之前）：loadInfo 完成后的重绘可能清空输入框
+    const amtText = (($("sellAmt") && $("sellAmt").value) || "").trim();
+    if (!amtText || Number(amtText) <= 0) return fail(t("sell.needAmt"));
+    const amountIn = ethers.parseUnits(amtText, 18);
+    if (!walletProvider) { toast(t("wc.connectingFirst")); await connect(); if (!walletProvider) return fail(t("wc.needConnect")); }
+    if (!info) { try { await loadInfo(); } catch { return fail(t("wc.needInfo")); } }
+    if (!info) return fail(t("wc.needInfo"));
+    const bp = new ethers.BrowserProvider(walletProvider);
+    const net = await bp.getNetwork();
+    if (Number(net.chainId) !== CHAIN_ID) return fail(t("t.wrongChain"));
+    const signer = await bp.getSigner();
+    const from = await signer.getAddress();
+    const cAddr = ethers.getAddress($("contract").value.trim());
+    const uAddr = ethers.getAddress($("usdt").value.trim());
+    const bal = await info.c.balanceOf(from);
+    if (amountIn > bal) return fail(t("sell.exceed"));
+    const slip = Math.max(0, Number($("sellSlip").value || "5")) / 100;
+    const router = new ethers.Contract(PANCAKE, [
+      "function getAmountsOut(uint amountIn, address[] memory path) view returns (uint[] memory amounts)",
+      "function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] path, address to, uint deadline)"
+    ], bp);
+    const path = [cAddr, uAddr];
+    let out;
+    try { out = await router.getAmountsOut(amountIn, path); } catch { return fail(t("sell.routeFail")); }
+    const amountOutMin = out[1] * BigInt(Math.floor((1 - slip) * 1e6)) / 1000000n;
+    try {
+      const tk = new ethers.Contract(cAddr, ["function allowance(address,address) view returns (uint256)", "function approve(address,uint256)"], bp);
+      const allow = await tk.allowance(from, PANCAKE);
+      if (allow < amountIn) {
+        toast(t("t.approving"));
+        const atx = await tk.approve(PANCAKE, amountIn);
+        await atx.wait();
+        toast(t("t.approveOk"), "ok");
+        if (stx) stx.innerHTML = txLink(t("tx.approve"), atx.hash);
+      }
+      toast(t("sell.selling"));
+      const tx = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(amountIn, amountOutMin, path, from, Math.floor(Date.now() / 1000) + 120);
+      const rc = await tx.wait();
+      toast(t("sell.ok"), "ok");
+      if (stx) stx.innerHTML = txLink(t("sell.tx"), tx.hash) + ` · gas: ${rc.gasUsed}`;
+      loadInfo().catch(() => {});
+      refreshSellBal();
+    } catch (e) {
+      const nested = e && ((e.info && e.info.error) || e.error);
+      const real = (nested && nested.message) || e.shortMessage || e.reason || e.message || "sell failed";
+      fail(String(real));
+    }
+  }
+
+  const _sellBtn = $("sellBtn");
+  if (_sellBtn) _sellBtn.addEventListener("click", doSell);
+  const _sellMax = $("sellMax");
+  if (_sellMax) _sellMax.addEventListener("click", async () => {
+    if (!info || !account) return toast(t("wc.needConnect"), "err");
+    try { const b = await info.c.balanceOf(account); const el = $("sellAmt"); if (el) el.value = ethers.formatUnits(b, 18); } catch {}
+  });
+
+  // 卖币卡片自己的连接钱包按钮：优先普通钱包（MetaMask/OKX 等注入钱包），没有才回落币安扫码
+  const _sellConnect = $("sellConnect");
+  function updateSellConnectBtn() {
+    if (_sellConnect) _sellConnect.textContent = account ? shortAddr(account) : (LANG === "zh" ? "连接钱包" : "Connect Wallet");
+  }
+  async function connectNormalWallet() {
+    // 1) EIP-6963 发现的钱包里挑一个非币安的
+    const normal = (typeof eip6963 !== "undefined" ? eip6963 : []).filter((d) => !String((d.info && d.info.rdns) || "").toLowerCase().includes("binance"));
+    const w = (normal[0] && normal[0].provider) ||
+      (window.ethereum && !(window.ethereum.isBinance || window.ethereum.isBinanceWeb3Wallet || window.ethereum.isBinanceW3W) ? window.ethereum : null);
+    if (!w) return false;
+    try {
+      const accs = await w.request({ method: "eth_requestAccounts" });
+      if (!accs || !accs[0]) return false;
+      walletProvider = w;
+      setAccount(ethers.getAddress(accs[0]));
+      return true;
+    } catch (e) {
+      toast(t("wc.needConnect"), "err");
+      return false;
+    }
+  }
+  if (_sellConnect) _sellConnect.addEventListener("click", async () => {
+    if (!walletProvider) {
+      const ok = await connectNormalWallet();
+      if (!ok) await connect(); // 没有普通钱包 → 走原有币安扫码/兜底
+    }
+    updateSellConnectBtn();
+    refreshSellBal();
+  });
+  updateSellConnectBtn();
+
+  // 动态生成 PancakeSwap 卖币链接（input=本币, output=USDT），供普通钱包直接打开
+  function updatePancakeLink() {
+    const el = $("al_panLink");
+    if (!el) return;
+    let cAddr;
+    try { cAddr = ethers.getAddress($("contract").value.trim()); } catch { return; }
+    let uAddr = "0x55d398326f99059fF775485246999027B3197955";
+    if (info && info.u && info.u.target) { try { uAddr = ethers.getAddress(info.u.target); } catch {} }
+    el.href = `https://pancakeswap.finance/swap?inputCurrency=${cAddr}&outputCurrency=${uAddr}`;
+  }
+  updatePancakeLink();
 
   // 环境提示：告诉用户当前浏览器能不能直接连币安钱包
   (function envHint() {
