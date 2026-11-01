@@ -1,4 +1,4 @@
-/* Agent人生 铸造页：地址填写 → 链上资格检查 → 生成可粘贴给 AI 代理的指令（支持中英切换） */
+/* bncb人生 铸造页：地址填写 → 链上资格检查 → 生成可粘贴给 AI 代理的指令（支持中英切换） */
 (function () {
   "use strict";
 
@@ -146,6 +146,15 @@
       "wp.addr": "已连接钱包", "wp.left": "剩余可 Mint", "wp.promoLabel": "我的推广链接",
       "wp.promoHint": "分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份", "wp.copy": "复制",
       "wp.hint": "连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可 Mint 次数。",
+      "hb1": "💎 100% 进 LP", "hb2": "🔒 LP 永久锁仓", "hb3": "🛡️ 合约无提取权限",
+      "cta.mint": "立即铸造", "cta.scan": "BscScan 核验",
+      "tok.title": "代币机制", "tok.sub": "每笔买入 / 卖出收取 3% 手续费，全部回馈社区：",
+      "tok.burn": "1% 销毁 · 通缩减量", "tok.div": "1% 持币分红 · USDT 空投", "tok.lp": "1% 回流 LP · 底池加深",
+      "faq.title": "常见问题",
+      "faq.q1": "谁能铸造？", "faq.a1": "持有 .ai Agent ID 的币安 Agentic Wallet 地址即可铸造，每个 Agent ID 可铸 10 份。",
+      "faq.q2": "铸造的代币能马上交易吗？", "faq.a2": "开盘前铸造的代币不可转账；合约达到铸造目标后自动开盘，注入 PancakeSwap 后即可交易。",
+      "faq.q3": "推广奖励怎么算？", "faq.a3": "分享你的专属推广链接（连接钱包后自动生成），每成功推荐 1 位已铸造者，你的额度 +1 份。",
+      "faq.q4": "资金安全吗？", "faq.a4": "铸造资金 100% 注入 LP 底池，LP 锁定至合约，合约无任何提取权限，全程链上可查。",
       "a1.h": "打开邀请链接", "a1.p": "用币安 App 扫码，或在币安 Web3 钱包内置浏览器打开，进入 Agent ID 页面。",
       "a2.h": "连接 / 创建 Agentic Wallet", "a2.p": "钱包里预留一点 BNB 付网络手续费。",
       "a3.h": "选 .ai 名称并提交", "a3.p": "按页面提示完成注册；是否仍需邀请名额，以官方页面显示为准。",
@@ -370,6 +379,15 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "wp.addr": "Connected wallet", "wp.left": "Mint quota left", "wp.promoLabel": "My referral link",
       "wp.promoHint": "Share this link — friends who mint via it add +1 to your mint quota per referred minter", "wp.copy": "Copy",
       "wp.hint": "After connecting your wallet, your exclusive referral link (?ref=your address) is generated here, and your remaining mint quota is shown.",
+      "hb1": "💎 100% to LP", "hb2": "🔒 LP locked forever", "hb3": "🛡️ No withdrawal rights",
+      "cta.mint": "Mint Now", "cta.scan": "Verify on BscScan",
+      "tok.title": "Tokenomics", "tok.sub": "3% fee on every buy / sell, all goes back to the community:",
+      "tok.burn": "1% burn · deflationary", "tok.div": "1% holder dividend in USDT", "tok.lp": "1% auto LP · deeper pool",
+      "faq.title": "FAQ",
+      "faq.q1": "Who can mint?", "faq.a1": "Any Binance Agentic Wallet holding a .ai Agent ID can mint; each Agent ID gets 10 shares.",
+      "faq.q2": "Can I trade right after minting?", "faq.a2": "Tokens minted before launch cannot be transferred; once the mint target is reached the pool opens on PancakeSwap automatically.",
+      "faq.q3": "How does the referral reward work?", "faq.a3": "Share your exclusive referral link (auto-generated after connecting your wallet); each referred minter adds +1 share to your quota.",
+      "faq.q4": "Is it safe?", "faq.a4": "100% of raised funds go into the LP, LP is locked to the contract, and the contract has no withdrawal rights — all verifiable on-chain.",
       "a1.h": "Open the invite link", "a1.p": "Scan with the Binance App or open it in the Binance Web3 wallet browser to reach the Agent ID page.",
       "a2.h": "Connect / create Agentic Wallet", "a2.p": "Keep a little BNB in the wallet for gas.",
       "a3.h": "Pick your .ai name and submit", "a3.p": "Follow the page instructions; whether an invite slot is still required follows the official page.",
@@ -484,8 +502,8 @@ If preview reports "execution reverted":
   };
 
   // 链上身份（name/symbol），默认回退值；loadInfo 读到链上后自动更新并重渲染
-  let CHAIN_NAME = "Agent人生";
-  let CHAIN_SYMBOL = "AGENT人生";
+  let CHAIN_NAME = "bncb人生";
+  let CHAIN_SYMBOL = "BNCB人生";
 
   // 换了 key：以前存过的语言偏好不再生效，一律从英文开始
   const LANG_KEY = "agt_lang_v2";
@@ -503,7 +521,7 @@ If preview reports "execution reverted":
     return s;
   }
 
-  let heroVals = { price: "1", perMint: "50,000,000", symbol: "AGENT人生", limit: "10", cap: "10,000" };
+  let heroVals = { price: "1", perMint: "50,000,000", symbol: "BNCB人生", limit: "10", cap: "10,000" };
   let heroReady = false; // 是否已拿到真实参数（链上读到的或本地缓存的）
 
   // 上次读到的参数缓存，按合约地址存，刷新时先渲染它，避免先显示默认值再跳变
@@ -723,14 +741,14 @@ If preview reports "execution reverted":
     const code = await provider.getCode(await c.getAddress()).catch(() => "0x");
     const mintVer = code && code.includes("836a1040") ? "shares" : "single";
 
-    info = { c, u, contract: await c.getAddress(), name, symbol, price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
+    info = { c, u, contract: await c.getAddress(), name: "bncb人生", symbol: "BNCB人生", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
 
-    CHAIN_NAME = name;
-    CHAIN_SYMBOL = symbol;
+    CHAIN_NAME = "bncb人生";
+    CHAIN_SYMBOL = "BNCB人生";
     heroVals = {
       price: ethers.formatUnits(price, usdtDec),
       perMint: Number(ethers.formatUnits(perMint, 18)).toLocaleString("en-US"),
-      symbol,
+      symbol: "BNCB人生",
       limit: String(maxPerWallet),
       cap: Number(maxMints).toLocaleString("en-US"),
     };

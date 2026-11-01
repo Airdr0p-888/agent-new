@@ -4,7 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="agent-wallet-api" content="https://agent-ai-agentic-wallet.onrender.com/api/agent-wallet" />
-<title>Agent人生 · Agent ID 专属铸造</title>
+<title>bncb人生 · Agent ID 专属铸造</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -18,9 +21,9 @@
 
 <header class="topbar">
   <div class="brand">
-    <div class="logo">AI</div>
+    <div class="logo">BNCB</div>
     <div>
-      <h1><span id="heroName">Agent人生</span> <span class="tag" id="heroSymbol">AGENT人生</span></h1>
+      <h1><span id="heroName">bncb人生</span> <span class="tag" id="heroSymbol">BNCB人生</span></h1>
       <p data-i18n="brand.sub">Agent ID 专属铸造 · BSC</p>
     </div>
   </div>
@@ -31,10 +34,24 @@
 </header>
 
 <section class="hero">
+  <div class="hero-badge">
+    <div class="hero-orb"></div>
+    <img class="hero-mascot" src="assets/mascot.png" alt="BNCB" onerror="this.remove()" />
+    <span class="hero-badge-text">BNCB</span>
+  </div>
   <h2 data-i18n-html="hero.title">持有币安 <em>Agent ID</em> 才能铸造</h2>
   <p data-i18n-html="hero.sub">
     下面填地址 → 自动检查资格 → 复制指令发给你的 AI 代理即可。
   </p>
+  <div class="hero-badges">
+    <span class="hbadge" data-i18n="hb1">💎 100% 进 LP</span>
+    <span class="hbadge" data-i18n="hb2">🔒 LP 永久锁仓</span>
+    <span class="hbadge" data-i18n="hb3">🛡️ 合约无提取权限</span>
+  </div>
+  <div class="hero-cta">
+    <a href="#mint" class="btn btn-primary" data-i18n="cta.mint">立即铸造</a>
+    <a href="https://bscscan.com/address/0x8F3b1c8916a264891a455144D4C485D5f1B2a129" target="_blank" rel="noopener" class="btn btn-ghost" data-i18n="cta.scan">BscScan 核验</a>
+  </div>
 </section>
 
 <main>
@@ -74,7 +91,7 @@
         <small data-i18n="sec.badges">高危 0 · 中危 0 · 提示 2</small>
       </div>
       <div class="sec-rows">
-        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">AGENT人生</span> (<a id="secAddrLink" href="https://bscscan.com/address/0x8F3b1c8916a264891a455144D4C485D5f1B2a129" target="_blank" rel="noopener">0xA1c0…7643</a>)</b></div>
+        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">BNCB人生</span> (<a id="secAddrLink" href="https://bscscan.com/address/0x8F3b1c8916a264891a455144D4C485D5f1B2a129" target="_blank" rel="noopener">0xA1c0…7643</a>)</b></div>
         <div><span data-i18n="sec.creator">创建者 / 拥有者</span><b>0xF6…9423</b></div>
         <div><span data-i18n="sec.liquidity">开盘动作</span><b data-i18n="sec.liquidityV">等量代币 + 募集 USDT 注入 PancakeSwap V2 交易对</b></div>
       </div>
@@ -91,9 +108,18 @@
     <p class="hint" data-i18n="sec.note">以上为 AVE.ai 合约检测参考快照；铸造前请在 BscScan 自行核验合约源码。</p>
   </div>
 
+  <!-- 代币机制 -->
+  <div class="card tok">
+    <h3 data-i18n="tok.title">代币机制</h3>
+    <p class="hint" style="margin-top:-8px" data-i18n="tok.sub">每笔买入 / 卖出收取 3% 手续费，全部回馈社区：</p>
+    <div class="tok-row"><i>🔥</i><span data-i18n="tok.burn">1% 销毁 · 通缩减量</span><div class="tok-bar"><i style="width:33.4%"></i></div><b>1%</b></div>
+    <div class="tok-row"><i>💰</i><span data-i18n="tok.div">1% 持币分红 · USDT 空投</span><div class="tok-bar"><i style="width:33.4%"></i></div><b>1%</b></div>
+    <div class="tok-row"><i>🌊</i><span data-i18n="tok.lp">1% 回流 LP · 底池加深</span><div class="tok-bar"><i style="width:33.4%"></i></div><b>1%</b></div>
+  </div>
+
   <div class="grid">
     <!-- 铸造区 -->
-    <div class="card">
+    <div class="card" id="mint">
       <h3 data-i18n="card.mint">铸造区</h3>
 
       <button id="connectBtn" class="btn btn-primary btn-lg" style="width:100%;margin:2px 0 16px" data-i18n="btn.connect">连接币安钱包</button>
@@ -239,6 +265,27 @@
     <p class="hint" data-i18n="social.note">搜索「请替换」即可找到待填链接；把 Telegram / X / Debox 三个换成你自己的地址。</p>
   </div>
 
+  <!-- 常见问题 -->
+  <div class="card faq">
+    <h3 data-i18n="faq.title">常见问题</h3>
+    <details>
+      <summary data-i18n="faq.q1">谁能铸造？</summary>
+      <p data-i18n="faq.a1">持有 .ai Agent ID 的币安 Agentic Wallet 地址即可铸造，每个 Agent ID 可铸 10 份。</p>
+    </details>
+    <details>
+      <summary data-i18n="faq.q2">铸造的代币能马上交易吗？</summary>
+      <p data-i18n="faq.a2">开盘前铸造的代币不可转账；合约达到铸造目标后自动开盘，注入 PancakeSwap 后即可交易。</p>
+    </details>
+    <details>
+      <summary data-i18n="faq.q3">推广奖励怎么算？</summary>
+      <p data-i18n="faq.a3">分享你的专属推广链接（连接钱包后自动生成），每成功推荐 1 位已铸造者，你的额度 +1 份。</p>
+    </details>
+    <details>
+      <summary data-i18n="faq.q4">资金安全吗？</summary>
+      <p data-i18n="faq.a4">铸造资金 100% 注入 LP 底池，LP 锁定至合约，合约无任何提取权限，全程链上可查。</p>
+    </details>
+  </div>
+
   <div class="card card-warn">
     <h3 data-i18n="card.warn">注意</h3>
     <ul class="notes">
@@ -271,6 +318,6 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <!-- WalletConnect v2 + 二维码（本地打包，无第三方依赖） -->
 <script src="vendor/wc.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
