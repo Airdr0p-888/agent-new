@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x12f1c60Bc47EF7d7df4aEBCC009776be29355a0B",
+    CONTRACT: "0xc65252a36433374deb9c62de014ca1c9bccd6b06",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
   };
@@ -741,14 +741,14 @@ If preview reports "execution reverted":
     const code = await provider.getCode(await c.getAddress()).catch(() => "0x");
     const mintVer = code && code.includes("836a1040") ? "shares" : "single";
 
-    info = { c, u, contract: await c.getAddress(), name: "bncb人生", symbol: "BNCB人生", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
+    info = { c, u, contract: await c.getAddress(), name: name || "bncb人生", symbol: symbol || "BNCB人生", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
 
-    CHAIN_NAME = "bncb人生";
-    CHAIN_SYMBOL = "BNCB人生";
+    CHAIN_NAME = name || "bncb人生";
+    CHAIN_SYMBOL = symbol || "BNCB人生";
     heroVals = {
       price: ethers.formatUnits(price, usdtDec),
       perMint: Number(ethers.formatUnits(perMint, 18)).toLocaleString("en-US"),
-      symbol: "BNCB人生",
+      symbol: symbol || "BNCB人生",
       limit: String(maxPerWallet),
       cap: Number(maxMints).toLocaleString("en-US"),
     };
