@@ -675,17 +675,16 @@ If preview reports "execution reverted":
         "function symbol() view returns (string)",
         "function PRICE() view returns (uint256)",
         "function PER_MINT() view returns (uint256)",
-        "function MAX_PER_WALLET() view returns (uint256)",
-        "function MAX_MINTS() view returns (uint256)",
-        "function mintCount() view returns (uint256)",
-        "function mintDeadline() view returns (uint256)",
+        "function maxSharesPerId() view returns (uint256)",
+        "function totalSharesCap() view returns (uint256)",
+        "function totalSharesMinted() view returns (uint256)",
+        "function mintedShares(address) view returns (uint256)",
+        "function referralBonus(address) view returns (uint256)",
+        "function raisedUSDT() view returns (uint256)",
         "function launched() view returns (bool)",
         "function USDT() view returns (address)",
         "function AGENT_ID() view returns (address)",
-        "function mintedBy(address) view returns (uint256)",
-        "function usdtRaised() view returns (uint256)",
         "function totalSupply() view returns (uint256)",
-        "function MAX_SUPPLY() view returns (uint256)",
       ],
       p
     );
@@ -695,17 +694,23 @@ If preview reports "execution reverted":
       p
     );
 
-    const [name, symbol, price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft] =
+    const [name, symbol, price, perMint, maxSharesPerId, totalSharesCap, totalSharesMinted, launched, usdtDec, nft] =
       await Promise.all([
-        c.name(), c.symbol(), c.PRICE(), c.PER_MINT(), c.MAX_PER_WALLET(), c.MAX_MINTS(),
-        c.mintCount(), c.mintDeadline(), c.launched(), u.decimals(), c.AGENT_ID(),
+        c.name(), c.symbol(), c.PRICE(), c.PER_MINT(), c.maxSharesPerId(), c.totalSharesCap(),
+        c.totalSharesMinted(), c.launched(), u.decimals(), c.AGENT_ID(),
       ]);
 
-    // 旧版合约可能没有 MAX_SUPPLY / usdtRaised，容错处理
-    const [usdtRaised, totalSupply, maxSupply] = await Promise.all([
-      c.usdtRaised().catch(() => price * mintCount),
-      c.totalSupply().catch(() => mintCount * perMint),
-      c.MAX_SUPPLY().catch(() => 0n),
+    // 兼容旧字段名（info / heroVals / updateProgress 仍引用这些名）
+    const maxPerWallet = maxSharesPerId;   // 基础上限（不含推广）
+    const maxMints = totalSharesCap;       // 总硬顶
+    const mintCount = totalSharesMinted;   // 已 mint 份数
+    const deadline = 0n;                   // 合约无 mint 截止时间
+    const maxSupply = 0n;
+
+    // 旧版合约可能没有 raisedUSDT，容错处理
+    const [usdtRaised, totalSupply] = await Promise.all([
+      c.raisedUSDT().catch(() => price * totalSharesMinted),
+      c.totalSupply().catch(() => totalSharesMinted * perMint),
     ]);
 
     // 探测合约版本：含新选择器 0x836a1040 说明是 shares 版，否则是旧的无参 mint()
@@ -744,7 +749,7 @@ If preview reports "execution reverted":
 
     let cls = "live", txt = t("prog.live");
     if (launched) { cls = "launched"; txt = t("prog.launched"); }
-    else if (now > deadline) { cls = "ended"; txt = t("prog.ended"); }
+    else if (deadline > 0n && now > deadline) { cls = "ended"; txt = t("prog.ended"); }
 
     $("prog_bar").style.width = Math.min(100, pct) + "%";
     $("prog_pct").textContent = pct.toFixed(1) + "%";
@@ -759,7 +764,7 @@ If preview reports "execution reverted":
     $("prog_left").textContent = String(left);
     $("prog_deadline").textContent = launched
       ? t("prog.done")
-      : (deadline > 10n ** 50n ? "未设定" : new Date(Number(deadline) * 1000).toLocaleString(LANG === "zh" ? "zh-CN" : "en-US", { hour12: false }));
+      : (deadline > 0n ? new Date(Number(deadline) * 1000).toLocaleString(LANG === "zh" ? "zh-CN" : "en-US", { hour12: false }) : "未设定");
   }
 
   /* ---------- 资格检查 ---------- */
@@ -778,7 +783,9 @@ If preview reports "execution reverted":
       row(d.usdtBal >= d.need, t("el.usdt", { v: d.fmtU(d.usdtBal) }), t("el.usdtNeed", { v: d.fmtU(d.need) })),
       row(d.bnb > 0n, t("el.bnb", { v: Number(ethers.formatEther(d.bnb)).toFixed(5) }), t("el.bnbNeed")),
       row(!d.launched, d.launched ? t("el.launched") : t("el.notLaunched"), t("el.progress", { a: String(d.mintCount), b: String(d.maxMints) })),
-      row(d.left >= d.count, t("el.quota", { n: String(d.left) }), t("el.quotaSub", { m: String(d.maxPerWallet), u: String(d.minted) })),
+      row(d.left >= d.count, t("el.quota", { n: String(d.left) }),
+        t("el.quotaSub", { m: String(d.maxPerWallet), u: String(d.minted) }) +
+        (Number(d.refBonus) > 0 ? (LANG === "zh" ? " · 推广加成 +" + d.refBonus + " 份" : " · referral +" + d.refBonus) : "")),
       row(d.deadline > d.now, d.deadline > d.now ? t("el.deadlineOk") : t("el.deadlineBad"), new Date(d.deadline * 1000).toLocaleString()),
       row(d.allowance >= d.need, t("el.allow", { v: d.fmtU(d.allowance) }), d.allowance >= d.need ? t("el.allowSkip") : t("el.allowNeed")),
     ];
@@ -798,15 +805,18 @@ If preview reports "execution reverted":
       const need = i.price * BigInt(count);
       const nft = new ethers.Contract(i.nft, ["function balanceOf(address) view returns (uint256)"], provider);
 
-      const [nftBal, usdtBal, bnb, minted, allowance] = await Promise.all([
-        nft.balanceOf(a), i.u.balanceOf(a), provider.getBalance(a), i.c.mintedBy(a), i.u.allowance(a, i.contract),
+      const [nftBal, usdtBal, bnb, minted, refBonus, allowance] = await Promise.all([
+        nft.balanceOf(a), i.u.balanceOf(a), provider.getBalance(a),
+        i.c.mintedShares(a), i.c.referralBonus(a), i.u.allowance(a, i.contract),
       ]);
 
       const fmtU = (v) => Number(ethers.formatUnits(v, Number(i.usdtDec))).toLocaleString("en-US", { maximumFractionDigits: 6 });
+      const userMax = Number(i.maxPerWallet) + Number(refBonus); // 基础上限 + 推广加成
       lastCheck = {
-        a, name: r.name, count, need, nftBal, usdtBal, bnb, minted, allowance, fmtU,
-        launched: i.launched, mintCount: i.mintCount, maxMints: i.maxMints, maxPerWallet: i.maxPerWallet,
-        left: Number(i.maxPerWallet) - Number(minted), deadline: Number(i.deadline), now: Math.floor(Date.now() / 1000),
+        a, name: r.name, count, need, nftBal, usdtBal, bnb, minted, refBonus, allowance, fmtU,
+        launched: i.launched, mintCount: i.mintCount, maxMints: i.maxMints,
+        basePerWallet: Number(i.maxPerWallet), maxPerWallet: userMax,
+        left: userMax - Number(minted), deadline: Number(i.deadline), now: Math.floor(Date.now() / 1000),
       };
       renderRows();
       toast(t("t.checkDone"), "ok");
