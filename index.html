@@ -20,7 +20,7 @@
   <div class="brand">
     <div class="logo">AI</div>
     <div>
-      <h1>Agent人生 <span class="tag">AGENT人生</span></h1>
+      <h1><span id="heroName">Agent人生</span> <span class="tag" id="heroSymbol">AGENT人生</span></h1>
       <p data-i18n="brand.sub">Agent ID 专属铸造 · BSC</p>
     </div>
   </div>
@@ -75,7 +75,7 @@
   <div class="card">
     <div class="sec-head">
       <h3 data-i18n="sec.title">合约安全检测</h3>
-      <a class="btn btn-mini" href="https://bscscan.com/address/0x99a629e1b735bbb89a78085cae1480d712d23c8b" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
+      <a class="btn btn-mini" href="https://bscscan.com/address/0x892584025038a86c933dc85897da828315ac2dca" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
     </div>
     <div class="sec-top">
       <div class="sec-score">
@@ -84,13 +84,13 @@
         <small data-i18n="sec.badges">高危 0 · 中危 0 · 提示 2</small>
       </div>
       <div class="sec-rows">
-        <div><span data-i18n="sec.contract">合约</span><b>AGENT人生 (<a href="https://bscscan.com/address/0x99a629e1b735bbb89a78085cae1480d712d23c8b" target="_blank" rel="noopener">0x99a6…3c8b</a>)</b></div>
+        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">AGENT人生</span> (<a id="secAddrLink" href="https://bscscan.com/address/0x892584025038a86c933dc85897da828315ac2dca" target="_blank" rel="noopener">0x8925…2dca</a>)</b></div>
         <div><span data-i18n="sec.creator">创建者 / 拥有者</span><b>0xF6…9423</b></div>
         <div><span data-i18n="sec.liquidity">开盘动作</span><b data-i18n="sec.liquidityV">等量代币 + 募集 USDT 注入 PancakeSwap V2 交易对</b></div>
       </div>
     </div>
     <h4 class="sec-sub" data-i18n="sec.summaryTitle">AI 概括</h4>
-    <p class="sec-summary" data-i18n="sec.summary">AGENT人生 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶。每份支付 PRICE 并获得 5,250 枚代币；开盘时，合约将等量代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 1% 手续费。</p>
+    <p class="sec-summary" data-i18n="sec.summary">{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶。每份支付 {price} 并获得 {perMint} 枚代币；开盘时，合约将等量代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 1% 手续费。</p>
     <h4 class="sec-sub" data-i18n="sec.taxTitle">AI 税收检测</h4>
     <ul class="sec-tax">
       <li data-i18n="sec.t1">买入税：1%</li>
@@ -118,7 +118,7 @@
 
       <details class="adv">
         <summary data-i18n="adv.summary">高级：合约 / 代币参数</summary>
-        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0x99a629e1b735bbb89a78085cae1480d712d23c8b" /></div>
+        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0x892584025038a86c933dc85897da828315ac2dca" /></div>
         <div class="field"><label data-i18n="label.usdt">USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
         <div class="field"><label data-i18n="label.nft">Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
       </details>
@@ -225,14 +225,14 @@
   <div class="card card-warn">
     <h3 data-i18n="card.warn">注意</h3>
     <ul class="notes">
-      <li data-i18n-html="w1">开盘前铸造到的 Agent人生 <b>不可转账</b>，需等开盘后才能交易。</li>
+      <li data-i18n-html="w1">开盘前铸造到的 {sym} <b>不可转账</b>，需等开盘后才能交易。</li>
       <li data-i18n="w2">每笔交易 AI 都会先 preview，请逐笔看清解析结果与风险再确认。</li>
       <li data-i18n="w3">本页只做地址填写与指令生成，不托管私钥、不代发交易。</li>
     </ul>
   </div>
 </main>
 
-<footer data-i18n="footer">Agent人生 · AGENT人生 — 本页不托管资产，请自行核对合约地址 · <a href="whitepaper.html" data-i18n="nav.wp">白皮书</a></footer>
+<footer data-i18n="footer">{name} · {sym} — 本页不托管资产，请自行核对合约地址 · <a href="whitepaper.html" data-i18n="nav.wp">白皮书</a></footer>
 
 <div id="toast"></div>
 

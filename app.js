@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x99a629e1b735bbb89a78085cae1480d712d23c8b",
+    CONTRACT: "0x892584025038a86c933dc85897da828315ac2dca",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
   };
@@ -34,7 +34,7 @@
   const I18N = {
     zh: {
       "brand.sub": "Agent ID 专属铸造 · BSC",
-      "ticker.text": "每份 1 USDT 换 5000万 枚 AGENT人生 · 持有币安 Agent ID 才能铸造 · 1万份硬顶 · 买卖 3% 税费（1% 销毁 + 1% 持币分红 USDT + 1% 回流 LP） · 推广一人多 1 份",
+      "ticker.text": "每份 {price} USDT 换 {perMint} 枚 {sym} · 持有币安 Agent ID 才能铸造 · {cap} 份硬顶 · 买卖 3% 税费（1% 销毁 + 1% 持币分红 USDT + 1% 回流 LP） · 推广一人多 1 份",
       "btn.connect": "连接币安钱包",
       "btn.walletMint": "一键铸造（Mint）",
       "wc.hint": "连接持有你 .ai Agent ID 的币安钱包，即可在本页直接铸造（approve + mint 两笔交易）",
@@ -155,10 +155,10 @@
       "p4.b": "Debox", "p4.s": "Debox 社群",
       "social.note": "搜索「请替换」即可找到待填链接；把 Telegram / X / Debox 三个换成你自己的地址。",
       "card.warn": "注意",
-      "w1": "开盘前铸造到的 AGENT人生 <b>不可转账</b>，需等开盘后才能交易。",
+      "w1": "开盘前铸造到的 {sym} <b>不可转账</b>，需等开盘后才能交易。",
       "w2": "每笔交易 AI 都会先 preview，请逐笔看清解析结果与风险再确认。",
       "w3": "本页只做地址填写与指令生成，不托管私钥、不代发交易。",
-      "footer": "Agent人生 · AGENT人生 — 本页不托管资产，请自行核对合约地址",
+      "footer": "{name} · {sym} — 本页不托管资产，请自行核对合约地址",
 
       "el.addr": "地址",
       "el.name": "Agent ID 名称 {n}", "el.resolved": "已解析为上方地址",
@@ -209,7 +209,7 @@
       "sec.liquidity": "开盘动作",
       "sec.liquidityV": "剩余代币 + 募集 USDT 注入 PancakeSwap V2 交易对（LP 发至部署地址，测试期可提取）",
       "sec.summaryTitle": "AI 概括",
-      "sec.summary": "AGENT人生 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（1 万份）。每份支付 1 USDT 获得 5000万 枚代币；开盘时，合约将剩余代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP，LP 发至部署地址）。",
+      "sec.summary": "{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（{cap} 份）。每份支付 {price} USDT 获得 {perMint} 枚代币；开盘时，合约将剩余代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP，LP 发至部署地址）。",
       "sec.taxTitle": "AI 税收检测",
       "sec.t1": "买入税：3%（1% 销毁 + 1% 分红 + 1% LP）",
       "sec.t2": "卖出税：3%（1% 销毁 + 1% 分红 + 1% LP）",
@@ -256,7 +256,7 @@
 
     en: {
       "brand.sub": "Agent ID exclusive mint · BSC",
-      "ticker.text": "1 USDT per share for 50,000,000 AGENT人生 · mint requires a Binance Agent ID · 10,000-share hard cap · 3% buy/sell tax (1% burn + 1% USDT holder dividend + 1% LP) · refer a friend for +1 share",
+      "ticker.text": "{price} USDT per share for {perMint} {sym} · mint requires a Binance Agent ID · {cap}-share hard cap · 3% buy/sell tax (1% burn + 1% USDT holder dividend + 1% LP) · refer a friend for +1 share",
       "btn.connect": "Connect Binance Wallet",
       "btn.walletMint": "Mint now",
       "wc.hint": "Connect the Binance wallet that holds your .ai Agent ID to mint directly on this page (approve + mint)",
@@ -376,10 +376,10 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "p4.b": "Debox", "p4.s": "Debox community",
       "social.note": "Search the file for the placeholder links and replace Telegram / X / Debox with your own.",
       "card.warn": "Notes",
-      "w1": "AGENT人生 minted before launch <b>cannot be transferred</b> until trading opens.",
+      "w1": "{sym} minted before launch <b>cannot be transferred</b> until trading opens.",
       "w2": "Your AI previews every transaction — read each parsed result and risk note before confirming.",
       "w3": "This page only builds the command. It never holds your keys or sends transactions for you.",
-      "footer": "Agent人生 · AGENT人生 — this page does not custody assets; always verify the contract address",
+      "footer": "{name} · {sym} — this page does not custody assets; always verify the contract address",
       "nav.wp": "Whitepaper",
 
       "el.addr": "Address",
@@ -431,7 +431,7 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "sec.liquidity": "At launch",
       "sec.liquidityV": "remaining tokens + raised USDT injected into the PancakeSwap V2 pair (LP sent to the deployer address, withdrawable during testing)",
       "sec.summaryTitle": "AI Summary",
-      "sec.summary": "AGENT人生 is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap (10,000 shares). Each share pays 1 USDT for 50,000,000 tokens; at launch the contract injects the remaining tokens and raised USDT into the PancakeSwap V2 pair. After launch, transfers involving the pair incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP, with LP sent to the deployer).",
+      "sec.summary": "{sym} is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap ({cap} shares). Each share pays {price} USDT for {perMint} tokens; at launch the contract injects the remaining tokens and raised USDT into the PancakeSwap V2 pair. After launch, transfers involving the pair incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP, with LP sent to the deployer).",
       "sec.taxTitle": "AI Tax Check",
       "sec.t1": "Buy tax: 3% (1% burn + 1% dividend + 1% LP)",
       "sec.t2": "Sell tax: 3% (1% burn + 1% dividend + 1% LP)",
@@ -477,6 +477,10 @@ If preview reports "execution reverted":
     },
   };
 
+  // 链上身份（name/symbol），默认回退值；loadInfo 读到链上后自动更新并重渲染
+  let CHAIN_NAME = "Agent人生";
+  let CHAIN_SYMBOL = "AGENT人生";
+
   // 换了 key：以前存过的语言偏好不再生效，一律从英文开始
   const LANG_KEY = "agt_lang_v2";
 
@@ -485,11 +489,15 @@ If preview reports "execution reverted":
 
   function t(key, vars) {
     let s = (I18N[LANG] && I18N[LANG][key]) || (I18N.zh[key] && I18N.zh[key]) || key;
-    if (vars) for (const k in vars) s = s.split("{" + k + "}").join(vars[k]);
+    const all = Object.assign(
+      { sym: CHAIN_SYMBOL, name: CHAIN_NAME, price: heroVals.price, perMint: heroVals.perMint, limit: heroVals.limit, cap: heroVals.cap || "10,000" },
+      vars || {}
+    );
+    for (const k in all) s = s.split("{" + k + "}").join(all[k]);
     return s;
   }
 
-  let heroVals = { price: "1", perMint: "50,000,000", symbol: "AGENT人生", limit: "10" };
+  let heroVals = { price: "1", perMint: "50,000,000", symbol: "AGENT人生", limit: "10", cap: "10,000" };
   let heroReady = false; // 是否已拿到真实参数（链上读到的或本地缓存的）
 
   // 上次读到的参数缓存，按合约地址存，刷新时先渲染它，避免先显示默认值再跳变
@@ -534,6 +542,21 @@ If preview reports "execution reverted":
     const sub = heroReady ? t("hero.sub", heroVals) : t("hero.loading");
     document.querySelectorAll("[data-i18n-html='hero.sub']").forEach((el) => (el.innerHTML = sub));
     document.querySelectorAll(".step .price").forEach((el) => (el.textContent = heroReady ? heroVals.price : "…"));
+    if ($("heroName")) $("heroName").textContent = CHAIN_NAME;
+    if ($("heroSymbol")) $("heroSymbol").textContent = CHAIN_SYMBOL;
+  }
+
+  // 用链上身份刷新 <title> / hero / 安全检测卡，并重渲染带占位符的文案
+  function paintIdentity() {
+    document.title = CHAIN_NAME + " · Agent ID 专属铸造";
+    const addr = (info && info.contract) || CONFIG.CONTRACT;
+    const short = addr ? addr.slice(0, 6) + "…" + addr.slice(-4) : "";
+    if ($("secName")) $("secName").textContent = CHAIN_SYMBOL;
+    if ($("secAddrLink")) {
+      $("secAddrLink").href = "https://bscscan.com/address/" + addr;
+      $("secAddrLink").textContent = short;
+    }
+    applyLang(LANG);
   }
 
   // 滚动条：克隆文案直到填满两屏宽，避免滚动时右侧出现空白
@@ -691,15 +714,19 @@ If preview reports "execution reverted":
 
     info = { c, u, contract: await c.getAddress(), name, symbol, price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
 
+    CHAIN_NAME = name;
+    CHAIN_SYMBOL = symbol;
     heroVals = {
       price: ethers.formatUnits(price, usdtDec),
       perMint: Number(ethers.formatUnits(perMint, 18)).toLocaleString("en-US"),
       symbol,
       limit: String(maxPerWallet),
+      cap: Number(maxMints).toLocaleString("en-US"),
     };
     heroReady = true;
     saveHeroCache(info.contract, heroVals);
     paintHero();
+    paintIdentity();
     $("usdt").value = await info.u.getAddress();
     $("nft").value = nft;
     updateProgress();
@@ -804,7 +831,7 @@ If preview reports "execution reverted":
     const amountText = Number(ethers.formatUnits(maxCost, dec)).toLocaleString("en-US", { maximumFractionDigits: 6 });
     const costText = Number(ethers.formatUnits(cost, dec)).toLocaleString("en-US", { maximumFractionDigits: 6 });
     const priceText = Number(ethers.formatUnits(price, dec)).toLocaleString("en-US", { maximumFractionDigits: 6 });
-    const name = info && info.name ? info.name : "Agent人生";
+    const name = info && info.name ? info.name : CHAIN_NAME;
     const totalText = Number(ethers.formatUnits(BigInt(info ? info.perMint : 0n) * shares, 18)).toLocaleString("en-US");
 
     // approve(mint 合约, maxCost)
@@ -1474,7 +1501,12 @@ If preview reports "execution reverted":
   $("copyBtn").addEventListener("click", copyCmd);
   $("mintBtn").addEventListener("click", mintWithWallet);
 
-  // 预填合约 / USDT / NFT 地址（部署后只需改上面 CONFIG.CONTRACT）
+  // 合约地址支持 URL 参数 ?contract=0x... 动态指定（覆盖源码默认值，部署新合约免改源码）
+  try {
+    const _c = new URLSearchParams(location.search).get("contract");
+    if (_c && ethers.isAddress(_c)) CONFIG.CONTRACT = ethers.getAddress(_c);
+  } catch {}
+  // 预填合约 / USDT / NFT 地址（USDT/NFT 随后会被 loadInfo 链上值覆盖）
   if ($("contract")) $("contract").value = CONFIG.CONTRACT;
   if ($("usdt")) $("usdt").value = CONFIG.USDT;
   if ($("nft")) $("nft").value = CONFIG.AGENT_ID_NFT;
