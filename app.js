@@ -1,4 +1,4 @@
-/* bncb人生 铸造页：地址填写 → 链上资格检查 → 生成可粘贴给 AI 代理的指令（支持中英切换） */
+/* 火星币 铸造页：地址填写 → 链上资格检查 → 生成可粘贴给 AI 代理的指令（支持中英切换） */
 (function () {
   "use strict";
 
@@ -498,8 +498,8 @@ If preview reports "execution reverted":
   };
 
   // 链上身份（name/symbol），默认回退值；loadInfo 读到链上后自动更新并重渲染
-  let CHAIN_NAME = "bncb人生";
-  let CHAIN_SYMBOL = "BNCB人生";
+  let CHAIN_NAME = "火星币";
+  let CHAIN_SYMBOL = "火星币";
 
   // 换了 key：以前存过的语言偏好不再生效，一律从英文开始
   const LANG_KEY = "agt_lang_v2";
@@ -517,7 +517,7 @@ If preview reports "execution reverted":
     return s;
   }
 
-  let heroVals = { price: "1", perMint: "50,000,000", symbol: "BNCB人生", limit: "10", cap: "10,000" };
+  let heroVals = { price: "1", perMint: "50,000,000", symbol: "火星币", limit: "10", cap: "10,000" };
   let heroReady = false; // 是否已拿到真实参数（链上读到的或本地缓存的）
 
   // 上次读到的参数缓存，按合约地址存，刷新时先渲染它，避免先显示默认值再跳变
@@ -739,14 +739,14 @@ If preview reports "execution reverted":
     const code = await provider.getCode(await c.getAddress()).catch(() => "0x");
     const mintVer = code && code.includes("836a1040") ? "shares" : "single";
 
-    info = { c, u, contract: await c.getAddress(), name: name || "bncb人生", symbol: symbol || "BNCB人生", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
+    info = { c, u, contract: await c.getAddress(), name: name || "火星币", symbol: symbol || "火星币", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
 
-    CHAIN_NAME = name || "bncb人生";
-    CHAIN_SYMBOL = symbol || "BNCB人生";
+    CHAIN_NAME = name || "火星币";
+    CHAIN_SYMBOL = symbol || "火星币";
     heroVals = {
       price: ethers.formatUnits(price, usdtDec),
       perMint: Number(ethers.formatUnits(perMint, 18)).toLocaleString("en-US"),
-      symbol: symbol || "BNCB人生",
+      symbol: symbol || "火星币",
       limit: String(maxPerWallet),
       cap: Number(maxMints).toLocaleString("en-US"),
     };
