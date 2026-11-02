@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>bncb人生 · BNCB人生 白皮书</title>
-<meta name="description" content="bncb人生 (BNCB人生) 白皮书：面向持有 .ai Agent ID 的币安 Agentic Wallet 的公平铸造，100% 进入 LP、LP 永久锁仓至合约、合约无提取权限。">
+<meta name="description" content="bncb人生 (BNCB人生) 白皮书：面向持有 .ai Agent ID 的币安 Agentic Wallet 的公平铸造，100% 进入 LP、LP 永久锁入黑洞、合约无提取权限。">
 <link rel="stylesheet" href="style.css">
 <style>
   .wp-wrap { max-width: 860px; margin: 0 auto; padding: 26px 18px 60px; }
@@ -70,17 +70,17 @@
       <h3>2. 四大核心设计</h3>
       <div class="pillars">
         <div class="pillar"><b>100% 进 LP</b><span>每一笔铸造资金全部进入流动性底池，不抽成、不进金库。</span></div>
-        <div class="pillar"><b>3% 税费（销毁+分红+LP）</b><span>买入 / 卖出各收取 3% 税费：1% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP（发至部署地址）。</span></div>
-        <div class="pillar"><b>LP 永久锁仓</b><span>流动性代币自动锁仓至合约地址，永久锁定，任何人都无法撤出。</span></div>
+        <div class="pillar"><b>3% 税费（销毁+分红+LP）</b><span>买入 / 卖出各收取 3% 税费：1% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP（开盘 LP 打入黑洞）。</span></div>
+        <div class="pillar"><b>LP 永久锁仓</b><span>流动性代币自动锁入黑洞地址（0xdead），永久锁定，任何人都无法撤出。</span></div>
         <div class="pillar"><b>零提取权限</b><span>合约不包含任何提款 / owner 函数，开发团队无法动用池内资产。</span></div>
       </div>
 
       <h3>3. 代币</h3>
       <ul>
         <li>名称 / 符号：bncb人生 / BNCB人生，18 位小数，BEP-20 标准。</li>
-        <li>总供应量仅在铸造时产生，硬上限由代币合约强制执行；只有铸造合约可以增发。</li>
-        <li>买入税 3%、卖出税 3%，写死在合约代码中：1% 销毁、1% 持币分红（USDT）、1% 回流自动加 LP，LP 发至部署地址（测试期可提取，正式版再决定锁仓）。</li>
-        <li>铸造阶段（开盘前）BNCB人生 不可转账；由部署者调用 launch() 开盘，将剩余代币与募集 USDT 注入 PancakeSwap V2 并解除转账锁定。</li>
+        <li>总供应量仅在铸造时产生，硬上限由代币合约强制执行。</li>
+        <li>买入税 3%、卖出税 3%，写死在合约代码中：1% 销毁、1% 持币分红（USDT）、1% 回流自动加 LP。</li>
+        <li>铸造阶段（开盘前）BNCB人生 不可转账；铸造打满后由合约自动开盘并丢弃权限（renounce），将剩余代币与募集 USDT 注入 PancakeSwap V2，LP 打入黑洞，并解除转账锁定。</li>
       </ul>
 
       <h3>4. 铸造</h3>
@@ -88,13 +88,12 @@
         <li>资格：发起交易的钱包必须持有 <code>.ai</code> Agent ID（链上读取 SPACE ID 注册表）。</li>
         <li>额度：每个 Agent ID 10 份；每笔交易最多 10 份。</li>
         <li>支付：用 USDT（先 approve 授权，再带最高成本 maxCost 调用 mint）即可。</li>
-        <li>铸造资金 100% 进入 LP 底池，LP 代币锁仓至合约、永久锁定。</li>
+        <li>铸造资金 100% 进入 LP 底池，LP 代币发射后自动打入黑洞、永久锁定。</li>
       </ul>
 
       <h3>5. 流动性与税费</h3>
       <ul>
-        <li>开盘时，募集到的 USDT 与剩余代币一起注入 BNCB人生/USDT 流动性池；LP 代币发往部署地址（测试期可提取，正式版再决定锁仓）。</li>
-        <li>买卖 1% 税费全部用于社区营销与生态回购，费率与接收方写死在代码中、不可更改。</li>
+        <li>开盘时，募集到的 USDT 与剩余代币一起注入 BNCB人生/USDT 流动性池，LP 打入黑洞。</li>
         <li>合约不含任何 withdraw / owner 类函数，团队无权限提取池内资金，资金安全由代码保证。</li>
       </ul>
 
@@ -109,17 +108,17 @@
       <h3>2. Four Core Principles</h3>
       <div class="pillars">
         <div class="pillar"><b>100% to LP</b><span>Every mint goes entirely into the liquidity pool — no skim, no treasury cut.</span></div>
-        <div class="pillar"><b>3% tax (burn + dividend + LP)</b><span>A 3% buy/sell tax: 1% burn, 1% USDT holder dividend, 1% auto-LP sent to the deployer address.</span></div>
-        <div class="pillar"><b>LP locked forever</b><span>Liquidity tokens are auto-locked into the contract, permanently — nobody can remove them.</span></div>
+        <div class="pillar"><b>3% tax (burn + dividend + LP)</b><span>A 3% buy/sell tax: 1% burn, 1% USDT holder dividend, 1% auto-LP locked to the burn address at launch.</span></div>
+        <div class="pillar"><b>LP locked forever</b><span>Liquidity tokens are auto-locked into the burn address (0xdead), permanently — nobody can remove them.</span></div>
         <div class="pillar"><b>Zero withdrawal power</b><span>The contract has no withdraw / owner functions; the team cannot touch pooled funds.</span></div>
       </div>
 
       <h3>3. Token</h3>
       <ul>
         <li>Name / symbol: bncb人生 / BNCB人生, 18 decimals, BEP-20.</li>
-        <li>Supply is created only by minting; the hard cap is enforced by the token contract. Only the mint contract can issue tokens.</li>
-        <li>Buy tax 3% and sell tax 3%, fixed in code: 1% burn, 1% USDT holder dividend, 1% auto-LP to the deployer address (withdrawable during testing).</li>
-        <li>BNCB人生 cannot be transferred before the pool opens; the pool opens automatically and the transfer lock is lifted in the same transaction at the agreed mint milestone.</li>
+        <li>Supply is created only by minting; the hard cap is enforced by the token contract.</li>
+        <li>Buy tax 3% and sell tax 3%, fixed in code: 1% burn, 1% USDT holder dividend, 1% auto-LP.</li>
+        <li>BNCB人生 cannot be transferred before the pool opens; once the mint cap is reached the contract auto-launches, renounces ownership, injects the remaining tokens and raised USDT into PancakeSwap V2 with LP sent to the burn address (0xdead), and lifts the transfer lock.</li>
       </ul>
 
       <h3>4. Minting</h3>
@@ -127,13 +126,13 @@
         <li>Eligibility: the sending wallet must hold a <code>.ai</code> Agent ID (read on-chain from the SPACE ID registry).</li>
         <li>Quota: 10 shares per Agent ID; max 10 shares per transaction.</li>
         <li>Pay with USDT (approve, then mint with a maximum cost maxCost).</li>
-        <li>100% of every mint goes into the LP pool; LP tokens are locked into the contract forever.</li>
+        <li>100% of every mint goes into the LP pool; LP tokens are auto-sent to the burn address (0xdead) at launch.</li>
       </ul>
 
       <h3>5. Liquidity &amp; Tax</h3>
       <ul>
-        <li>At launch, the raised USDT and remaining tokens are added to the BNCB人生/USDT pool; LP tokens go to the deployer address (withdrawable during testing).</li>
-        <li>The 3% buy/sell tax (1% burn + 1% dividend + 1% LP) is fixed in code and cannot be changed; the LP recipient is the deployer address.</li>
+        <li>At launch, the raised USDT and remaining tokens are added to the BNCB人生/USDT pool; LP tokens are auto-sent to the burn address (0xdead).</li>
+        <li>The 3% buy/sell tax (1% burn + 1% dividend + 1% LP) is fixed in code and cannot be changed.</li>
         <li>The contract contains no withdraw / owner functions, so the team has no authority to extract pooled funds — safety is guaranteed by code.</li>
       </ul>
 
@@ -143,7 +142,7 @@
 
     <h3><span class="zh">合约地址</span><span class="en">Contracts</span></h3>
     <div class="panel" id="addrBox">
-      <div class="row"><span><span class="zh">铸造 / 代币合约</span><span class="en">Mint &amp; Token</span></span><span class="mono"><a href="https://bscscan.com/address/0xf8082df71b910eb01fc811d4c7678431737a0cbf" target="_blank" rel="noopener">0xf8082df71b910eb01fc811d4c7678431737a0cbf</a></span></div>
+      <div class="row"><span><span class="zh">铸造 / 代币合约</span><span class="en">Mint &amp; Token</span></span><span class="mono"><a href="https://bscscan.com/address/0x7d9f5Dba4b11Cb59da777c1D6269151Cc9bb2c7C" target="_blank" rel="noopener">0x7d9f5Dba4b11Cb59da777c1D6269151Cc9bb2c7C</a></span></div>
       <div class="row"><span>USDT</span><span class="mono"><a href="https://bscscan.com/address/0x55d398326f99059fF775485246999027B3197955" target="_blank" rel="noopener">0x55d398326f99059fF775485246999027B3197955</a></span></div>
       <div class="row"><span><span class="zh">Agent ID 注册表</span><span class="en">Agent ID registry</span></span><span class="mono"><a href="https://bscscan.com/address/0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" target="_blank" rel="noopener">0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</a></span></div>
     </div>
@@ -165,6 +164,51 @@
   var saved = q === "zh" || q === "en" ? q : (localStorage.getItem("agt-lang") || "zh");
   btn.onclick = function () { set(document.body.className === "lang-zh" ? "en" : "zh"); };
   set(saved);
+})();
+</script>
+
+<script>
+(function () {
+  var TOKEN = "0x7d9f5Dba4b11Cb59da777c1D6269151Cc9bb2c7C";
+  var RPC = "https://bsc-dataseed.binance.org/";
+  var DEF_NAME = "bncb人生", DEF_SYMBOL = "BNCB人生";
+
+  function hexToBytes(h){ h = h.replace(/^0x/,""); var a = []; for (var i=0;i<h.length;i+=2) a.push(parseInt(h.substr(i,2),16)); return a; }
+  function decodeString(hex){
+    hex = (hex || "").replace(/^0x/,"");
+    if (hex.length === 64) { // 固定长度 bytes32 类型
+      var b = hexToBytes(hex), out = [];
+      for (var i=0;i<b.length;i++){ if (b[i]===0) break; out.push(b[i]); }
+      return new TextDecoder("utf-8").decode(Uint8Array.from(out));
+    }
+    if (hex.length < 128) return "";
+    var len = parseInt(hex.substr(64,64),16);
+    if (!len || len > hex.length/2) return "";
+    var dataHex = hex.substr(128, len*2);
+    return new TextDecoder("utf-8").decode(Uint8Array.from(hexToBytes(dataHex)));
+  }
+  function rpc(data){
+    return fetch(RPC, { method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ jsonrpc:"2.0", id:1, method:"eth_call", params:[{ to: TOKEN, data:data }, "latest"] }) })
+      .then(function(r){ return r.json(); }).then(function(j){ return (j && j.result) ? j.result : "0x"; });
+  }
+  function applyToken(name, symbol){
+    name = name || DEF_NAME; symbol = symbol || DEF_SYMBOL;
+    if (name === DEF_NAME && symbol === DEF_SYMBOL) return; // 链上值等于默认则保留手写文案
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false), nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function(n){
+      if (n.nodeValue.indexOf(DEF_NAME) >= 0 || n.nodeValue.indexOf(DEF_SYMBOL) >= 0) {
+        n.nodeValue = n.nodeValue.split(DEF_NAME).join(name).split(DEF_SYMBOL).join(symbol);
+      }
+    });
+    var meta = document.querySelector('meta[name="description"]');
+    if (meta) { var c = meta.getAttribute("content"); meta.setAttribute("content", c.split(DEF_NAME).join(name).split(DEF_SYMBOL).join(symbol)); }
+    if (document.title) document.title = document.title.split(DEF_NAME).join(name).split(DEF_SYMBOL).join(symbol);
+  }
+  Promise.all([ rpc("0x06fdde03"), rpc("0x95d89b41") ])
+    .then(function(res){ applyToken(decodeString(res[0]), decodeString(res[1])); })
+    .catch(function(){ /* RPC 失败 / 离线：保留默认文案 */ });
 })();
 </script>
 </body>
