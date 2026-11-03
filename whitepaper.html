@@ -80,7 +80,7 @@
         <li>名称 / 符号：火星币 / 火星币，18 位小数，BEP-20 标准。</li>
         <li>总供应量仅在铸造时产生，硬上限由代币合约强制执行。</li>
         <li>买入税 3%、卖出税 3%，写死在合约代码中：1% 销毁、1% 持币分红（USDT）、1% 回流自动加 LP。</li>
-        <li>铸造阶段（开盘前）火星币 不可转账；铸造打满后由合约自动开盘并丢弃权限（renounce），将剩余代币与募集 USDT 注入 PancakeSwap V2，LP 打入黑洞，并解除转账锁定。</li>
+        <li>铸造阶段（开盘前）火星币 不可转账；由 owner 在打满前手动开盘（launch）：合约把募集的 USDT 与等值的已铸代币注入 PancakeSwap V2 建立流动性，未售出的剩余代币留在黑洞等效销毁，随后丢弃权限（renounce）、LP 打入黑洞并解除转账锁定。注意：打满后黑洞已无剩余代币，若此时才开盘将不会建立流动性，务必在打满前开盘。</li>
       </ul>
 
       <h3>4. 铸造</h3>
@@ -93,7 +93,7 @@
 
       <h3>5. 流动性与税费</h3>
       <ul>
-        <li>开盘时，募集到的 USDT 与剩余代币一起注入 火星币/USDT 流动性池，LP 打入黑洞。</li>
+        <li>开盘时，募集到的 USDT 与等值的已铸代币注入 火星币/USDT 流动性池，未售出的剩余代币留在黑洞；LP 打入黑洞。</li>
         <li>合约不含任何 withdraw / owner 类函数，团队无权限提取池内资金，资金安全由代码保证。</li>
       </ul>
 
@@ -118,7 +118,7 @@
         <li>Name / symbol: 火星币 / 火星币, 18 decimals, BEP-20.</li>
         <li>Supply is created only by minting; the hard cap is enforced by the token contract.</li>
         <li>Buy tax 3% and sell tax 3%, fixed in code: 1% burn, 1% USDT holder dividend, 1% auto-LP.</li>
-        <li>火星币 cannot be transferred before the pool opens; once the mint cap is reached the contract auto-launches, renounces ownership, injects the remaining tokens and raised USDT into PancakeSwap V2 with LP sent to the burn address (0xdead), and lifts the transfer lock.</li>
+        <li>火星币 cannot be transferred before the pool opens. The owner launches manually before the cap is reached: the contract injects the raised USDT and an equal amount of minted tokens into PancakeSwap V2, unsold tokens stay in the burn address (0xdead), then renounces ownership and sends LP to 0xdead, lifting the transfer lock. Note: after the cap the burn address is empty, so a launch then creates no liquidity — always launch before the cap.</li>
       </ul>
 
       <h3>4. Minting</h3>
@@ -131,7 +131,7 @@
 
       <h3>5. Liquidity &amp; Tax</h3>
       <ul>
-        <li>At launch, the raised USDT and remaining tokens are added to the 火星币/USDT pool; LP tokens are auto-sent to the burn address (0xdead).</li>
+        <li>At launch, the raised USDT and an equal amount of minted tokens are added to the 火星币/USDT pool; unsold remaining tokens stay in the burn address (0xdead); LP tokens are auto-sent to 0xdead.</li>
         <li>The 3% buy/sell tax (1% burn + 1% dividend + 1% LP) is fixed in code and cannot be changed.</li>
         <li>The contract contains no withdraw / owner functions, so the team has no authority to extract pooled funds — safety is guaranteed by code.</li>
       </ul>
@@ -142,7 +142,7 @@
 
     <h3><span class="zh">合约地址</span><span class="en">Contracts</span></h3>
     <div class="panel" id="addrBox">
-      <div class="row"><span><span class="zh">铸造 / 代币合约</span><span class="en">Mint &amp; Token</span></span><span class="mono"><a href="https://bscscan.com/address/0x3616a363D596020377eBcA58A4a50986cB11A6A3" target="_blank" rel="noopener">0x3616a363D596020377eBcA58A4a50986cB11A6A3</a></span></div>
+      <div class="row"><span><span class="zh">铸造 / 代币合约</span><span class="en">Mint &amp; Token</span></span><span class="mono"><a href="https://bscscan.com/address/0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8" target="_blank" rel="noopener">0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8</a></span></div>
       <div class="row"><span>USDT</span><span class="mono"><a href="https://bscscan.com/address/0x55d398326f99059fF775485246999027B3197955" target="_blank" rel="noopener">0x55d398326f99059fF775485246999027B3197955</a></span></div>
       <div class="row"><span><span class="zh">Agent ID 注册表</span><span class="en">Agent ID registry</span></span><span class="mono"><a href="https://bscscan.com/address/0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" target="_blank" rel="noopener">0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</a></span></div>
     </div>
@@ -169,7 +169,7 @@
 
 <script>
 (function () {
-  var TOKEN = "0x3616a363D596020377eBcA58A4a50986cB11A6A3";
+  var TOKEN = "0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8";
   var RPC = "https://bsc-dataseed.binance.org/";
   var DEF_NAME = "火星币", DEF_SYMBOL = "火星币";
 

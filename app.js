@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x3616a363D596020377eBcA58A4a50986cB11A6A3",
+    CONTRACT: "0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
   };
@@ -152,7 +152,7 @@
       "tok.burn": "1% 销毁 · 通缩减量", "tok.div": "1% 持币分红 · USDT 空投", "tok.lp": "1% 回流 LP · 底池加深",
       "faq.title": "常见问题",
       "faq.q1": "谁能铸造？", "faq.a1": "持有 .ai Agent ID 的币安 Agentic Wallet 地址即可铸造，每个 Agent ID 可铸 10 份。",
-      "faq.q2": "铸造的代币能马上交易吗？", "faq.a2": "开盘前铸造的代币不可转账；合约达到铸造目标后自动开盘，注入 PancakeSwap 后即可交易。",
+      "faq.q2": "铸造的代币能马上交易吗？", "faq.a2": "开盘前铸造的代币不可转账；由 owner 在打满前手动开盘（launch），合约将募集 USDT 与等值的已铸代币注入 PancakeSwap，未售出的剩余代币留在黑洞。注意：打满后若自动触发开盘将不建立流动性，务必提前开盘。",
       "faq.q3": "推广奖励怎么算？", "faq.a3": "分享你的专属推广链接（连接钱包后自动生成），每成功推荐 1 位已铸造者，你的额度 +1 份。",
       "faq.q4": "资金安全吗？", "faq.a4": "铸造资金 100% 注入 LP 底池，LP 发射后自动打入黑洞，合约无任何提取权限，全程链上可查。",
       "a1.h": "打开邀请链接", "a1.p": "用币安 App 扫码，或在币安 Web3 钱包内置浏览器打开，进入 Agent ID 页面。",
@@ -217,9 +217,9 @@
       "sec.contract": "合约",
       "sec.creator": "创建者 / 拥有者",
       "sec.liquidity": "开盘动作",
-      "sec.liquidityV": "剩余代币 + 募集 USDT 注入 PancakeSwap V2 交易对",
+      "sec.liquidityV": "等值代币 + 募集 USDT 注入 PancakeSwap V2 交易对",
       "sec.summaryTitle": "AI 概括",
-      "sec.summary": "{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（{cap} 份）。每份支付 {price} USDT 获得 {perMint} 枚代币；开盘时，合约将剩余代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP）。",
+      "sec.summary": "{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（{cap} 份）。每份支付 {price} USDT 获得 {perMint} 枚代币；开盘时，合约将等值代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP）。",
       "sec.taxTitle": "AI 税收检测",
       "sec.t1": "买入税：3%（1% 销毁 + 1% 分红 + 1% LP）",
       "sec.t2": "卖出税：3%（1% 销毁 + 1% 分红 + 1% LP）",
@@ -449,9 +449,9 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "sec.contract": "Contract",
       "sec.creator": "Creator / Owner",
       "sec.liquidity": "At launch",
-      "sec.liquidityV": "remaining tokens + raised USDT injected into the PancakeSwap V2 pair",
+      "sec.liquidityV": "equal minted tokens + raised USDT injected into the PancakeSwap V2 pair",
       "sec.summaryTitle": "AI Summary",
-      "sec.summary": "{sym} is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap ({cap} shares). Each share pays {price} USDT for {perMint} tokens; at launch the contract injects the remaining tokens and raised USDT into the PancakeSwap V2 pair. After launch, transfers involving the pair incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP).",
+      "sec.summary": "{sym} is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap ({cap} shares). Each share pays {price} USDT for {perMint} tokens; at launch the contract injects an equal amount of minted tokens and the raised USDT into the PancakeSwap V2 pair. After launch, transfers involving the pair incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP).",
       "sec.taxTitle": "AI Tax Check",
       "sec.t1": "Buy tax: 3% (1% burn + 1% dividend + 1% LP)",
       "sec.t2": "Sell tax: 3% (1% burn + 1% dividend + 1% LP)",
@@ -1389,10 +1389,14 @@ If preview reports "execution reverted":
         gasUsed += rc.gasUsed;
       }
       toast(t("t.mintOk"), "ok");
-      if (wtx)
-        wtx.innerHTML = hashes
-          .map((h, i) => txLink(times > 1 ? `${t("tx.mint")} ${i + 1}` : t("tx.mint"), h))
-          .join(" · ") + ` · ${t("tx.gas")}: ${gasUsed}`;
+      if (wtx) {
+        wtx.className = "hint tx-success";
+        wtx.innerHTML =
+          hashes
+            .map((h, i) => `<div class="tx-row">✅ ${times > 1 ? t("tx.mint") + " " + (i + 1) : t("tx.mint")}：<a href="https://bscscan.com/tx/${h}" target="_blank" rel="noopener">${shortAddr(h)}</a></div>`)
+            .join("") +
+          `<div class="tx-gas">⛽ ${t("tx.gas")}: ${gasUsed}</div>`;
+      }
       loadInfo().catch(() => {});
     } catch (e) {
       // ethers 会把底层错误包装成 "could not coalesce error"，真实原因在 info.error 里，挖出来直接显示
@@ -1432,6 +1436,40 @@ If preview reports "execution reverted":
   // 按钮可能不存在（老页面），加个空判断避免整个脚本挂掉
   const _connectBtn = $("connectBtn");
   if (_connectBtn) _connectBtn.addEventListener("click", connect);
+
+  // 刷新网页后自动重连：已授权的注入式钱包无需再点「连接钱包」，且切换账户/网络会自动同步
+  (function autoReconnect() {
+    const w = injectedWallet() || window.ethereum;
+    if (!w) return;
+    if (w.on) {
+      w.on("accountsChanged", (accs) => {
+        if (accs && accs.length) {
+          walletProvider = w;
+          setAccount(accs[0]);
+          connMsg("已连接 " + shortAddr(accs[0]));
+          toast("已切换账户", "ok");
+        } else {
+          account = null;
+          walletProvider = null;
+          const cb = $("connectBtn");
+          if (cb) cb.textContent = "连接钱包";
+          connMsg("已断开钱包");
+          const panel = $("walletPanel");
+          if (panel) panel.classList.add("hidden");
+        }
+      });
+      w.on("chainChanged", () => location.reload());
+    }
+    w.request({ method: "eth_accounts" })
+      .then((accs) => {
+        if (accs && accs.length) {
+          walletProvider = w;
+          setAccount(accs[0]);
+          connMsg("已连接 " + shortAddr(accs[0]));
+        }
+      })
+      .catch(() => {});
+  })();
 
   // 取消按钮不能用内联 onclick（app.js 是 IIFE，closeQr 不是全局函数），必须在这里绑定
   const _qrCancel = $("qrCancel");
@@ -1588,7 +1626,11 @@ If preview reports "execution reverted":
     heroVals = cached;
     heroReady = true;
   }
-  setInterval(() => loadInfo().catch(() => {}), 30000); // auto refresh mint progress
+  // 自动刷新：每 10 秒刷新全局 mint 进度，若已连钱包则同时刷新「基础+推广」剩余次数
+  setInterval(async () => {
+    try { await loadInfo(); } catch {}
+    if (account && info) { try { await refreshWallet(); } catch {} }
+  }, 10000);
   applyLang(LANG);
   loadInfo().catch(() => {
     // 读不到链上参数时退回默认值，避免一直显示"读取中"
