@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0xbEB0886917589b93b5Bf7c165d67f267b7Df3633",
+    CONTRACT: "0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
     BSCSCAN_API_KEY: "", // 留空走链上分段查询；填入 BscScan 免费 API Key 则走 BscScan（更快、不限区块）
@@ -1106,23 +1106,7 @@ If preview reports "execution reverted":
 
   async function connect() {
     if (agentApiUrl()) return connectAgentic();
-    const w = injectedWallet();
-    if (w) {
-      connMsg(t("wc.connecting"));
-      try {
-        const accs = await w.request({ method: "eth_requestAccounts" });
-        walletProvider = w;
-        setAccount(accs[0]);
-        connMsg(t("wc.connected") + " " + shortAddr(accs[0]));
-        toast(t("t.walletOk"), "ok");
-      } catch (e) {
-        connMsg(t("t.connectFail") + "：" + ((e && (e.shortMessage || e.message)) || ""), true);
-        toast(e.message || t("t.connectFail"), "err");
-      }
-      return;
-    }
-
-    // 浏览器里没有钱包 → WalletConnect v2 扫码连币安 App
+    // 不调用浏览器注入式钱包（避免误连 MetaMask 等）；直接走 WalletConnect 扫码连币安 App
     const W = window.WCMint;
     if (W && W.EthereumProvider) {
       const pid = wcProjectId();
@@ -1591,46 +1575,6 @@ If preview reports "execution reverted":
       opt.classList.add("active");
     });
   });
-
-  // 刷新网页后自动重连：已授权的注入式钱包无需再点「连接钱包」，且切换账户/网络会自动同步
-  (function autoReconnect() {
-    const w = injectedWallet() || window.ethereum;
-    if (!w) return;
-    if (w.on) {
-      w.on("accountsChanged", (accs) => {
-        if (accs && accs.length) {
-          walletProvider = w;
-          setAccount(accs[0]);
-          connMsg("已连接 " + shortAddr(accs[0]));
-          toast("已切换账户", "ok");
-        } else {
-          account = null;
-          walletProvider = null;
-          const cb = $("connectBtn");
-          if (cb) cb.textContent = "连接以验证 ↗";
-          const tcb = $("topConnectBtn");
-          if (tcb) tcb.innerHTML = '连接钱包 <span class="arrow">↗</span>';
-          const tst = $("topWalletStatus");
-          if (tst) { tst.textContent = "钱包未连接"; tst.classList.remove("ok"); }
-          const acs = $("acStatus");
-          if (acs) { acs.textContent = "需要持有 .ai Agent ID 才能铸造。"; acs.classList.remove("ok"); }
-          connMsg("已断开钱包");
-          const panel = $("walletPanel");
-          if (panel) panel.classList.add("hidden");
-        }
-      });
-      w.on("chainChanged", () => location.reload());
-    }
-    w.request({ method: "eth_accounts" })
-      .then((accs) => {
-        if (accs && accs.length) {
-          walletProvider = w;
-          setAccount(accs[0]);
-          connMsg("已连接 " + shortAddr(accs[0]));
-        }
-      })
-      .catch(() => {});
-  })();
 
   // 取消按钮不能用内联 onclick（app.js 是 IIFE，closeQr 不是全局函数），必须在这里绑定
   const _qrCancel = $("qrCancel");
