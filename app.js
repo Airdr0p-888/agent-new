@@ -1221,6 +1221,83 @@ If preview reports "execution reverted":
     for (const value of Object.values(obj)) { const found = nested(value, keys); if (found) return found; }
     return null;
   }
+  function saveAgenticLogin(obj) {
+    try { localStorage.setItem("agentic_login", JSON.stringify(obj)); } catch {}
+  }
+  function clearAgenticLogin() {
+    try { localStorage.removeItem("agentic_login"); } catch {}
+  }
+  function readAgenticLogin() {
+    try { return JSON.parse(localStorage.getItem("agentic_login")); } catch { return null; }
+  }
+
+  // 币安 Agentic Wallet 的登录态默认只活在 JS 内存里：手机切到币安 App 再返回，
+  // 浏览器标签页会被后台冻结甚至重载，内存里的会话（含等待中的 confirm 长轮询）随之丢失，
+  // 于是「返回网页不显示登录」。把会话存进 localStorage，页面加载时自动恢复即可解决。
+  function buildAgenticProvider(address) {
+    return {
+      async request({ method, params = [] }) {
+        if (method === "eth_chainId") return "0x38";
+        if (method === "eth_accounts" || method === "eth_requestAccounts") return [address];
+        if (["eth_blockNumber", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_getBalance"].includes(method)) {
+          return rpcCall(method, params);
+        }
+        if (method === "eth_sendTransaction") {
+          const tx = params[0];
+          const preview = await agentCall("preview", { tx: { from: address, to: tx.to, value: tx.value || "0", inputData: tx.data || "0x" } });
+          const requestId = nested(preview.result, ["requestId"]);
+          if (!requestId) throw new Error("交易预览未返回 requestId");
+          const executed = await agentCall("execute", { requestId });
+          const hash = nested(executed.result, ["txHash", "transactionHash", "hash"]);
+          if (!hash) throw new Error("等待币安 App 确认交易");
+          return hash;
+        }
+        if (method.startsWith("eth_")) {
+          return rpcCall(method, params);
+        }
+        throw new Error("Unsupported wallet method: " + method);
+      },
+    };
+  }
+
+  function showAgenticQr({ url, pair }) {
+    const box = $("qrBox");
+    if (box) box.innerHTML = window.WCMint?.qrSvg ? window.WCMint.qrSvg(url) : url;
+    $("qrMode").textContent = "用币安 App 扫码，核对配对码后确认登录。";
+    $("awPair").textContent = pair || "——";
+    $("wcOpen").href = url; $("wcOpen").textContent = "打开币安登录";
+    $("qrModal").classList.remove("hidden");
+    $("awWait").textContent = "等待币安 App 扫码并确认…";
+  }
+
+  // 等待币安 App 确认（长轮询 confirm）。成功则连上；用户取消或会话失效则抛错。
+  async function waitAgenticConfirm(qrCodeId) {
+    const verified = await agentCall("confirm", { qrCodeId });
+    if (qrAborted) throw new Error("已取消登录");
+    const wallet = await agentCall("wallet");
+    const address = wallet.address;
+    agenticProvider = buildAgenticProvider(address);
+    closeQr(); walletProvider = agenticProvider; setAccount(address);
+    connMsg("Agentic Wallet 已连接 " + shortAddr(address)); toast(t("t.walletOk"), "ok");
+  }
+
+  // 页面加载时静默恢复登录态：手机从币安 App 返回后（即使标签页被重载），
+  // 若已在 App 端确认过，这里会立即连上；若还没确认，则重新亮出二维码让用户继续扫。
+  async function restoreAgenticSession() {
+    if (!agentApiUrl() || walletProvider || account) return;
+    const saved = readAgenticLogin();
+    if (!saved || !saved.sessionId || !saved.qrCodeId) return;
+    agenticSession = saved.sessionId;
+    showAgenticQr(saved);
+    try {
+      await waitAgenticConfirm(saved.qrCodeId);
+    } catch (e) {
+      if (!qrAborted) clearAgenticLogin();
+      closeQr();
+      connMsg("上次的登录会话已失效，请重新点击「连接钱包」。", true);
+    }
+  }
+
   async function connectAgentic() {
     try {
       qrAborted = false;
@@ -1232,45 +1309,11 @@ If preview reports "execution reverted":
       const qrCodeId = nested(data, ["qrCodeId"]);
       const pair = nested(data, ["pairingCode"]);
       if (!url || !qrCodeId) throw new Error("未收到币安登录二维码");
-      const box = $("qrBox");
-      if (box) box.innerHTML = window.WCMint?.qrSvg ? window.WCMint.qrSvg(url) : url;
-      $("qrMode").textContent = "用币安 App 扫码，核对配对码后确认登录。";
-      $("awPair").textContent = pair || "——";
-      $("wcOpen").href = url; $("wcOpen").textContent = "打开币安登录";
-      $("qrModal").classList.remove("hidden");
-      $("awWait").textContent = "等待币安 App 扫码并确认…";
-      const verified = await agentCall("confirm", { qrCodeId });
-      if (qrAborted) throw new Error("已取消登录");
-      const wallet = await agentCall("wallet");
-      const address = wallet.address;
-      agenticProvider = {
-        async request({ method, params = [] }) {
-          if (method === "eth_chainId") return "0x38";
-          if (method === "eth_accounts" || method === "eth_requestAccounts") return [address];
-          if (["eth_blockNumber", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_getBalance"].includes(method)) {
-            return rpcCall(method, params);
-          }
-          if (method === "eth_sendTransaction") {
-            const tx = params[0];
-            const preview = await agentCall("preview", { tx: { from: address, to: tx.to, value: tx.value || "0", inputData: tx.data || "0x" } });
-            const requestId = nested(preview.result, ["requestId"]);
-            if (!requestId) throw new Error("交易预览未返回 requestId");
-            const executed = await agentCall("execute", { requestId });
-            const hash = nested(executed.result, ["txHash", "transactionHash", "hash"]);
-            if (!hash) throw new Error("等待币安 App 确认交易");
-            return hash;
-          }
-          // 其余 eth_* 方法（estimateGas / gasPrice / getTransactionCount / maxPriorityFeePerGas 等）转发到 BSC 公共 RPC，
-          // 让 ethers 能完成交易填充（populateTransaction），否则 sendTransaction 会直接抛错
-          if (method.startsWith("eth_")) {
-            return rpcCall(method, params);
-          }
-          throw new Error("Unsupported wallet method: " + method);
-        },
-      };
-      closeQr(); walletProvider = agenticProvider; setAccount(address);
-      connMsg("Agentic Wallet 已连接 " + shortAddr(address)); toast(t("t.walletOk"), "ok");
+      saveAgenticLogin({ sessionId: agenticSession, qrCodeId, url, pair });
+      showAgenticQr({ url, pair });
+      await waitAgenticConfirm(qrCodeId);
     } catch (e) {
+      clearAgenticLogin();
       closeQr(); connMsg("Agentic Wallet 连接失败：" + (e.message || e), true); toast(e.message || "连接失败", "err");
     }
   }
@@ -1578,7 +1621,7 @@ If preview reports "execution reverted":
 
   // 取消按钮不能用内联 onclick（app.js 是 IIFE，closeQr 不是全局函数），必须在这里绑定
   const _qrCancel = $("qrCancel");
-  if (_qrCancel) _qrCancel.addEventListener("click", closeQr);
+  if (_qrCancel) _qrCancel.addEventListener("click", () => { clearAgenticLogin(); closeQr(); });
 
 
   // 环境提示：告诉用户当前浏览器能不能直接连币安钱包
@@ -1742,4 +1785,6 @@ If preview reports "execution reverted":
     heroReady = true;
     paintHero();
   });
+  // 手机从币安 App 返回后自动恢复登录态（即使标签页被重载也能连上）
+  restoreAgenticSession().catch(() => {});
 })();
