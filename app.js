@@ -78,6 +78,13 @@
       "wc.pidSaved": "projectId 已保存",
       "wc.connecting": "正在建立连接…",
       "wc.connected": "钱包已连接",
+      "wc.noInjected": "此环境没有检测到可用的浏览器钱包（TP / MetaMask / 币安钱包插件等）。请改用「Agentic Wallet 扫码」连接。",
+      "wl.title": "你的身份。你的信号。",
+      "wl.agentic": "Agentic Wallet 扫码",
+      "wl.agenticSub": "连接币安 Agentic Wallet",
+      "wl.browser": "浏览器钱包",
+      "wl.browserSub": "连接可用的 EVM 钱包（TP / MetaMask 等）",
+      "wl.note": "配对用于连接钱包；Mint 资格会另行验证 .ai 所有权。每次 Mint 均需确认。",
       "wc.needConnect": "请先在铸造区连接币安钱包",
       "wc.needInfo": "链上参数还没读到，请稍等再试",
       "tx.mint": "铸造交易",
@@ -304,6 +311,13 @@
       "wc.pidSaved": "projectId saved",
       "wc.connecting": "Connecting…",
       "wc.connected": "Wallet connected",
+      "wc.noInjected": "No browser wallet (TP / MetaMask / Binance Wallet extension, etc.) detected here. Use \"Agentic Wallet QR\" instead.",
+      "wl.title": "Your identity. Your signal.",
+      "wl.agentic": "Agentic Wallet QR",
+      "wl.agenticSub": "Connect Binance Agentic Wallet",
+      "wl.browser": "Browser wallet",
+      "wl.browserSub": "Connect an available EVM wallet (TP / MetaMask, etc.)",
+      "wl.note": "Pairing is for connecting the wallet; mint eligibility verifies .ai ownership separately. Every mint requires confirmation.",
       "wc.needConnect": "Connect your Binance wallet first (in the mint box)",
       "wc.needInfo": "On-chain params not loaded yet, please retry",
       "tx.mint": "Mint tx",
@@ -1105,8 +1119,48 @@ If preview reports "execution reverted":
     return L.join("\n");
   }
 
-  async function connect() {
+  // 连接入口：先弹「选择连接方式」（Agentic 扫码 / 浏览器钱包），再按选择走对应流程
+  function connect() {
+    const m = $("walletModal");
+    if (m) m.classList.remove("hidden");
+  }
+
+  function closeWalletChooser() {
+    const m = $("walletModal");
+    if (m) m.classList.add("hidden");
+  }
+
+  async function connectAgenticRoute() {
+    closeWalletChooser();
     if (agentApiUrl()) return connectAgentic();
+    return connectWC(); // 没有 Agentic API → 退化为 WalletConnect 扫码连币安 App
+  }
+
+  // 浏览器注入式钱包（TP / MetaMask / 币安插件等）：用于读地址、资格检查与推广链接。
+  // 注意：真正的「用币安 AI 钱包铸造」仍走 Agentic 流程，这里只负责连接与查询。
+  async function connectBrowserWallet() {
+    closeWalletChooser();
+    const w = injectedWallet() || (eip6963[0] && eip6963[0].provider) || window.ethereum;
+    if (!w) {
+      connMsg(t("wc.noInjected"), true);
+      toast(t("wc.noInjected"), "err");
+      return;
+    }
+    connMsg(t("wc.connecting"));
+    try {
+      const accs = await w.request({ method: "eth_requestAccounts" });
+      walletProvider = w;
+      setAccount(accs[0]);
+      connMsg(t("wc.connected") + " " + shortAddr(accs[0]));
+      toast(t("t.walletOk"), "ok");
+    } catch (e) {
+      connMsg(t("t.connectFail") + "：" + ((e && (e.shortMessage || e.message)) || ""), true);
+      toast(e.message || t("t.connectFail"), "err");
+    }
+  }
+
+  // WalletConnect 扫码连币安 App（无 Agentic API 时的兜底）
+  async function connectWC() {
     // 不调用浏览器注入式钱包（避免误连 MetaMask 等）；直接走 WalletConnect 扫码连币安 App
     const W = window.WCMint;
     if (W && W.EthereumProvider) {
@@ -1501,11 +1555,11 @@ If preview reports "execution reverted":
       if (wtx0) wtx0.innerHTML = `<span class="err">${msg}</span>`;
     };
 
-    // 没连钱包就先连（弹二维码 / 唤起币安 App），连上后自动接着铸造 —— 点一次就行
+    // 没连钱包就先连（弹「选择连接方式」），连接成功后再点一次铸造
     if (!walletProvider) {
       toast(t("wc.connectingFirst"));
       await connect();
-      if (!walletProvider) return fail(t("wc.needConnect"));
+      return;
     }
     if (!info) {
       try {
@@ -1611,6 +1665,13 @@ If preview reports "execution reverted":
   // 右上角连接钱包按钮（复用同一套 connect 逻辑）
   const _topConnectBtn = $("topConnectBtn");
   if (_topConnectBtn) _topConnectBtn.addEventListener("click", connect);
+  // 连接方式选择弹层
+  const _wlAgentic = $("wlAgentic");
+  if (_wlAgentic) _wlAgentic.addEventListener("click", connectAgenticRoute);
+  const _wlBrowser = $("wlBrowser");
+  if (_wlBrowser) _wlBrowser.addEventListener("click", connectBrowserWallet);
+  const _wlCancel = $("wlCancel");
+  if (_wlCancel) _wlCancel.addEventListener("click", closeWalletChooser);
 
   // PAY WITH 代币切换（视觉高亮，铸造仍以 USDT 为准）
   document.querySelectorAll(".pw-opt").forEach((opt) => {

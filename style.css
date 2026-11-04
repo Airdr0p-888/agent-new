@@ -179,6 +179,26 @@ main { max-width: 1120px; margin: 0 auto; padding: 10px 24px 60px; display: flex
 .qr svg { display: block; }
 .modal-box .hint { font-size: 11.5px; }
 
+/* 连接方式选择弹层（Agentic 扫码 / 浏览器钱包） */
+.wl-title { letter-spacing: 1px; }
+.wl-opts { display: flex; flex-direction: column; gap: 12px; margin: 16px 0 10px; }
+.wl-opt {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; cursor: pointer; text-align: left; color: var(--text);
+  font: inherit; transition: border-color .15s, transform .15s, background .15s;
+}
+.wl-opt:hover { border-color: var(--gold); transform: translateY(-1px); background: #1a2340; }
+.wl-ic {
+  flex: none; width: 38px; height: 38px; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 9px;
+  color: var(--gold-2); font-weight: 700; font-size: 14px;
+}
+.wl-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wl-txt b { font-size: 15px; }
+.wl-txt small { color: var(--muted); font-size: 12px; }
+.wl-arrow { color: var(--muted); font-size: 18px; }
+
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 

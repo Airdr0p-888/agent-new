@@ -239,6 +239,27 @@
   </div>
 </div>
 
+<!-- 选择连接方式弹层 -->
+<div id="walletModal" class="modal hidden">
+  <div class="modal-box">
+    <h3 class="wl-title" data-i18n="wl.title">你的身份。你的信号。</h3>
+    <div class="wl-opts">
+      <button type="button" class="wl-opt" id="wlAgentic">
+        <span class="wl-ic">ID</span>
+        <span class="wl-txt"><b data-i18n="wl.agentic">Agentic Wallet 扫码</b><small data-i18n="wl.agenticSub">连接币安 Agentic Wallet</small></span>
+        <span class="wl-arrow">→</span>
+      </button>
+      <button type="button" class="wl-opt" id="wlBrowser">
+        <span class="wl-ic">↗</span>
+        <span class="wl-txt"><b data-i18n="wl.browser">浏览器钱包</b><small data-i18n="wl.browserSub">连接可用的 EVM 钱包（TP / MetaMask 等）</small></span>
+        <span class="wl-arrow">→</span>
+      </button>
+    </div>
+    <p class="hint" data-i18n="wl.note">配对用于连接钱包；Mint 资格会另行验证 .ai 所有权。每次 Mint 均需确认。</p>
+    <div style="margin-top:14px"><button id="wlCancel" class="btn btn-ghost">取消</button></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <!-- WalletConnect v2 + 二维码（本地打包，无第三方依赖） -->
 <script src="vendor/wc.js"></script>
