@@ -25,6 +25,11 @@
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   .panel a { color: var(--gold-2); text-decoration: none; word-break: break-all; }
   .panel a:hover { text-decoration: underline; }
+  .paper h4 { margin: 22px 0 8px; font-size: 16px; color: var(--text); }
+  .paper ol { padding-left: 22px; }
+  .paper ol li { margin-bottom: 8px; color: var(--text); line-height: 1.75; font-size: 14.5px; }
+  .paper a { color: var(--gold-2); text-decoration: none; word-break: break-all; }
+  .paper a:hover { text-decoration: underline; }
   .pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
   .pillar { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
   .pillar b { color: var(--gold-2); display: block; margin-bottom: 4px; }
@@ -138,6 +143,74 @@
 
       <h3>6. Independence</h3>
       <p>火星币 is an independent community project. It is not affiliated with, endorsed by, or operated by Binance, SPACE ID, PancakeSwap, or any other party; it only uses their public on-chain contracts and standard interfaces.</p>
+    </div>
+
+    <div class="zh">
+      <h3>7. 铸造操作指南</h3>
+
+      <h4>用币安 AI 钱包（Agentic Wallet）铸造</h4>
+      <ul>
+        <li>选好份数 → 点「生成 AI 指令」，指令会<b>自动复制</b>到剪贴板，直接粘贴给 AI 即可。</li>
+        <li>把指令发给你自己的 AI 代理（需已安装币安 Agentic Wallet 的 <code>baw</code> CLI 并开启 devMode）。</li>
+        <li>代理会用你的 AI 钱包完成 approve + mint，每笔都会先 preview 并等你确认。</li>
+      </ul>
+      <p>本页支持两种铸造方式：① 在铸造页点「连接币安钱包」直接铸造（扫码 → 在币安 App 内确认）；② 或点「生成 AI 指令」交给 AI 代理执行。Agentic Wallet 是给 AI 代理用的钱包，没有网页直连接口，因此方式②由网页生成指令、AI 代理执行，与 jager.live 做法一致。</p>
+
+      <h4>让 AI 代理帮你铸造</h4>
+      <ol>
+        <li><b>开启开发者模式</b>：在币安 App 中，为你的 Agentic Wallet 开启开发者模式（Agentic Wallet → 设置 → 开发者模式）。</li>
+        <li><b>检查资格</b>：在铸造页填写你的 .ai 名称。该地址需持有 Agent ID，每份 1 USDT，并预留少量 BNB 付手续费。</li>
+        <li><b>发给你的 AI 代理</b>：把指令粘贴到 Agentic Wallet 的 AI 对话里，每一步它会先预览，等你确认后再执行。</li>
+      </ol>
+
+      <h4>如何申请 Agent ID</h4>
+      <ol>
+        <li><b>打开邀请链接</b>：用币安 App 扫码，或在币安 Web3 钱包内置浏览器打开，进入 Agent ID 页面。</li>
+        <li><b>连接 / 创建 Agentic Wallet</b>：钱包里预留一点 BNB 付网络手续费。</li>
+        <li><b>选 .ai 名称并提交</b>：按页面提示完成注册；是否仍需邀请名额，以官方页面显示为准。</li>
+        <li><b>回来检查资格</b>：Agent ID 到账后，在铸造页填地址点「检查资格」，显示持有 ≥ 1 即可铸造。</li>
+      </ol>
+      <p>注册流程与名额以币安官方页面为准，可能随时调整。</p>
+
+      <h4>社区与推广入口</h4>
+      <ul>
+        <li><a href="https://web3.binance.com/agent-id/aveai?src=user_share" target="_blank" rel="noopener">币安 AI 钱包申请链接（去注册）</a></li>
+        <li><a href="https://x.com/marscoin_bsc1" target="_blank" rel="noopener">X / Twitter（官方推特）</a></li>
+      </ul>
+    </div>
+
+    <div class="en">
+      <h3>7. Minting &amp; AI Agent Guide</h3>
+
+      <h4>Mint with Binance AI Wallet (Agentic Wallet)</h4>
+      <ul>
+        <li>Pick the share count → click "Generate AI instruction"; the instruction is auto-copied to the clipboard, just paste it to your AI.</li>
+        <li>Send the instruction to your own AI agent (requires the Binance Agentic Wallet <code>baw</code> CLI with devMode enabled).</li>
+        <li>The agent uses your AI wallet to do approve + mint; each step previews first and waits for your confirmation.</li>
+      </ul>
+      <p>This page supports two minting methods: ① click "Connect Binance Wallet" on the mint page to mint directly (scan QR → confirm in the Binance App); ② or click "Generate AI instruction" and let the AI agent execute it. Agentic Wallet is a wallet for AI agents with no direct web interface, so method ② has the page generate the instruction and the AI agent execute it, the same approach as jager.live.</p>
+
+      <h4>Let your AI agent mint for you</h4>
+      <ol>
+        <li><b>Enable developer mode</b>: in the Binance App, enable developer mode for your Agentic Wallet (Agentic Wallet → Settings → Developer Mode).</li>
+        <li><b>Check eligibility</b>: on the mint page, enter your .ai name. The wallet must hold an Agent ID, 1 USDT per share, and keep a little BNB for gas.</li>
+        <li><b>Send to your AI agent</b>: paste the instruction into the Agentic Wallet AI chat; it previews each step and waits for your confirmation before executing.</li>
+      </ol>
+
+      <h4>How to apply for an Agent ID</h4>
+      <ol>
+        <li><b>Open the invite link</b>: scan with the Binance App, or open it in the Binance Web3 wallet built-in browser to enter the Agent ID page.</li>
+        <li><b>Connect / create an Agentic Wallet</b>: keep a little BNB in the wallet for network fees.</li>
+        <li><b>Pick a .ai name and submit</b>: complete registration per the page prompts; whether an invite quota is still required is subject to the official page.</li>
+        <li><b>Come back to check eligibility</b>: once the Agent ID arrives, enter the address on the mint page and click "Check eligibility"; holding ≥ 1 means you can mint.</li>
+      </ol>
+      <p>Registration flow and quotas are subject to Binance's official page and may change at any time.</p>
+
+      <h4>Community &amp; Promotion</h4>
+      <ul>
+        <li><a href="https://web3.binance.com/agent-id/aveai?src=user_share" target="_blank" rel="noopener">Binance AI Wallet sign-up link (register)</a></li>
+        <li><a href="https://x.com/marscoin_bsc1" target="_blank" rel="noopener">X / Twitter (official)</a></li>
+      </ul>
     </div>
 
     <h3><span class="zh">合约地址</span><span class="en">Contracts</span></h3>

@@ -794,7 +794,8 @@ If preview reports "execution reverted":
 
   async function loadMintRanking() {
     const tb = $("rankBody");
-    if (tb) tb.innerHTML = '<tr><td colspan="4" class="rank-empty">加载中…</td></tr>';
+    if (!tb) return; // 排行榜已移除，跳过查询
+    tb.innerHTML = '<tr><td colspan="4" class="rank-empty">加载中…</td></tr>';
     if (!info || !info.c) return;
     // 有 BscScan Key 优先走 BscScan（一次请求拿最近 10 条，不限区块跨度）
     if (CONFIG.BSCSCAN_API_KEY) {
