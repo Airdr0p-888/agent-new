@@ -9,6 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
+  <style>
+    .table-wrap{overflow-x:auto}
+    .rank-table{width:100%;border-collapse:collapse;font-size:14px}
+    .rank-table th,.rank-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;white-space:nowrap}
+    .rank-table th{color:#9fb0c0;font-weight:600}
+    .rank-table td.rank-addr{font-family:ui-monospace,Menlo,Consolas,monospace}
+    .rank-empty{text-align:center;color:#9fb0c0;padding:18px}
+  </style>
 </head>
 <body>
 <div class="glow"></div>
@@ -28,6 +36,10 @@
     </div>
   </div>
   <div class="topbar-actions">
+    <div class="wallet-top">
+      <span class="wallet-status" id="topWalletStatus">钱包未连接</span>
+      <button id="topConnectBtn" class="btn btn-connect" type="button">连接钱包 <span class="arrow">↗</span></button>
+    </div>
     <a class="btn btn-ghost" href="whitepaper.html" data-i18n="nav.wp">白皮书</a>
     <button id="langBtn" class="btn btn-ghost" title="中文 / English">EN</button>
   </div>
@@ -120,43 +132,64 @@
   <div class="grid">
     <!-- 铸造区 -->
     <div class="card" id="mint">
-      <h3 data-i18n="card.mint">铸造区</h3>
+      <h3>铸造区</h3>
 
-      <button id="connectBtn" class="btn btn-primary btn-lg" style="width:100%;margin:2px 0 16px" data-i18n="btn.connect">连接币安钱包</button>
+      <!-- Agent ID 凭证 / 验证（对应目标站 AGENT ID 区） -->
+      <div class="agent-cred">
+        <div class="ac-badge">
+          <span class="ac-k">AGENT ID</span>
+          <span class="ac-v">ONE AND ONLY</span>
+        </div>
+        <div class="ac-main">
+          <div class="ac-name"><span class="ai-dot">.ai</span> <span id="acName">火星币</span></div>
+          <div class="ac-sub">AGENT ACCESS CREDENTIAL · BSC / 56</div>
+          <div class="ac-status" id="acStatus">需要持有 .ai Agent ID 才能铸造。</div>
+        </div>
+        <button id="connectBtn" class="btn btn-primary">连接以验证 ↗</button>
+      </div>
 
-      <div id="walletPanel" style="margin:4px 0 16px;padding:12px 14px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.04);">
-        <p id="wpHint" class="hint" data-i18n="wp.hint">连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可 Mint 次数。</p>
+      <div id="walletPanel" class="wp-panel">
+        <p id="wpHint" class="hint">连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可铸造次数。</p>
         <div id="wpBody" class="hidden">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;"><span data-i18n="wp.addr">已连接钱包</span><b id="wpAddr"></b></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;"><span data-i18n="wp.left">剩余可 Mint</span><b id="wpLeft">—</b></div>
-          <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.18);">
-            <b data-i18n="wp.promoLabel">我的推广链接</b>
-            <p class="hint" style="margin:6px 0 0" data-i18n="wp.promoHint">分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份</p>
-            <div style="display:flex;gap:8px;margin-top:8px;">
-              <input id="wpLink" readonly style="flex:1;min-width:0;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.25);color:#e8eaf0;font-size:12px;" />
-              <button id="wpCopy" class="btn btn-mini" data-i18n="wp.copy">复制</button>
+          <div class="wp-row"><span>已连接钱包</span><b id="wpAddr"></b></div>
+          <div class="wp-row"><span>剩余可 Mint</span><b id="wpLeft">—</b></div>
+          <div class="wp-promo">
+            <b>我的推广链接</b>
+            <p class="hint" style="margin:6px 0 0">分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份</p>
+            <div class="wp-linkrow">
+              <input id="wpLink" readonly />
+              <button id="wpCopy" class="btn btn-mini">复制</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label data-i18n="label.count">铸造份数</label>
-          <div id="count" class="count-seg"></div>
-          <span class="hint" data-i18n="hint.count">选择要铸造的份数（1–10），生成 AI 指令后由你的 AI 钱包一次性完成授权与铸造</span>
+      <!-- 支付面板 -->
+      <div class="pay-panel">
+        <div class="pay-with">
+          <span class="pw-label">PAY WITH</span>
+          <div class="pw-opts">
+            <button type="button" class="pw-opt active" data-token="USDT">₮ USDT <i class="pw-check">✓</i></button>
+          </div>
         </div>
+        <div class="pay-row"><span>合计</span><b id="payTotal">— USDT</b></div>
+        <div class="pay-row pay-muted"><span>可用额度</span><b id="payQuota">—</b></div>
+      </div>
+
+      <div class="pay-detail">
+        <b>支付明细</b>
+        <p>报价暂时不可用。已确认的铸造数量与份额价格仍可读取，准备铸造前请刷新页面。</p>
       </div>
 
       <details class="adv">
-        <summary data-i18n="adv.summary">高级：合约 / 代币参数</summary>
-        <div class="field"><label data-i18n="label.contract">合约地址</label><input id="contract" value="0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8" /></div>
-        <div class="field"><label data-i18n="label.usdt">USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
-        <div class="field"><label data-i18n="label.nft">Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
+        <summary>高级：合约 / 代币参数</summary>
+        <div class="field"><label>合约地址</label><input id="contract" value="0xbEB0886917589b93b5Bf7c165d67f267b7Df3633" /></div>
+        <div class="field"><label>USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
+        <div class="field"><label>Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
       </details>
 
       <div class="btn-row">
-        <button id="genBtn" class="btn btn-primary btn-lg" data-i18n="btn.gen">生成 AI 指令</button>
+        <button id="genBtn" class="btn btn-primary btn-lg">生成 AI 指令</button>
         <button id="mintBtn" class="btn btn-primary btn-lg">用币安 AI 钱包铸造</button>
       </div>
       <div id="wtx" class="hint"></div>
@@ -164,9 +197,9 @@
 
     <!-- 指令区 -->
     <div class="card card-accent">
-      <h3><span data-i18n="card.cmd">AI 指令</span><button id="copyBtn" class="btn btn-mini" data-i18n="btn.copy">复制</button></h3>
-      <textarea id="cmd" rows="18" data-i18n-ph="ph.cmd" placeholder="填好地址后点「生成 AI 指令」，这里会出现可直接粘贴给 AI 代理的完整指令"></textarea>
-      <p class="hint" data-i18n="hint.cmd">把这段指令粘到 Agentic Wallet 的 AI 对话里，它会逐步 preview 并等你确认。</p>
+      <h3><span>AI 指令</span><button id="copyBtn" class="btn btn-mini">复制</button></h3>
+      <textarea id="cmd" rows="18" placeholder="填好地址后点「生成 AI 指令」，这里会出现可直接粘贴给 AI 代理的完整指令"></textarea>
+      <p class="hint">把这段指令粘到 Agentic Wallet 的 AI 对话里，它会逐步 preview 并等你确认。</p>
     </div>
   </div>
 
@@ -250,6 +283,17 @@
       </a>
     </div>
 
+  </div>
+
+  <!-- 铸造排行榜 -->
+  <div class="card">
+    <h3>铸造排行榜 · 最近 10 笔</h3>
+    <div class="table-wrap">
+      <table class="rank-table">
+        <thead><tr><th>#</th><th>地址</th><th>时间</th><th>金额(USDT)</th></tr></thead>
+        <tbody id="rankBody"><tr><td colspan="4" class="rank-empty">加载中…</td></tr></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 常见问题 -->

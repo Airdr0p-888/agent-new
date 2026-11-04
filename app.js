@@ -17,9 +17,10 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x34d918240c7c43c454d68e67b3eb82e95cfd5ce8",
+    CONTRACT: "0xbEB0886917589b93b5Bf7c165d67f267b7Df3633",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
+    BSCSCAN_API_KEY: "", // 留空走链上分段查询；填入 BscScan 免费 API Key 则走 BscScan（更快、不限区块）
   };
 
   // 推广链接 ?ref=0x... 读取（作为默认推荐人；实际是否生效以链上 isMinted[ref] 为准）
@@ -35,7 +36,7 @@
     zh: {
       "brand.sub": "Agent ID 专属铸造 · BSC",
       "ticker.text": "每份 {price} USDT 换 {perMint} 枚 {sym} · 持有币安 Agent ID 才能铸造 · {cap} 份硬顶 · 买卖 3% 税费（1% 销毁 + 1% 持币分红 USDT + 1% 回流 LP） · 推广一人多 1 份",
-      "btn.connect": "连接币安钱包",
+      "btn.connect": "连接以验证 ↗",
       "btn.walletMint": "一键铸造（Mint）",
       "wc.hint": "连接持有你 .ai Agent ID 的币安钱包，即可在本页直接铸造（approve + mint 两笔交易）",
       "wc.title": "代理钱包",
@@ -127,7 +128,7 @@
       "label.tokenId": "Agent ID 编号（选填）",
       "ph.tokenId": "例如 1234",
       "label.count": "铸造次数",
-      "hint.count": "选择要铸造的份数（1–10），生成 AI 指令后由你的 AI 钱包一次性完成授权与铸造",
+      "hint.count": "Up to 10 per transaction · 选择要铸造的份数（1–10），生成 AI 指令后由你的 AI 钱包一次性完成授权与铸造",
       "adv.summary": "高级：合约 / 代币参数",
       "label.contract": "合约地址", "label.usdt": "USDT 合约", "label.nft": "Agent ID NFT",
       "nav.wp": "白皮书",
@@ -173,13 +174,13 @@
       "el.addr": "地址",
       "el.name": "Agent ID 名称 {n}", "el.resolved": "已解析为上方地址",
       "el.nft": "Agent ID 持有 {n} 个", "el.nftBad": "需要持有才能 mint",
-      "el.usdt": "USDT 余额 {v}", "el.usdtNeed": "需 {v} USDT",
+      "el.usdt": "USDT 余额 {v}", "el.usdtNeed": "需 {v} USDT", "el.payBal": "{sym} 余额 {v}", "el.payNeed": "需 {v} {sym}",
       "el.bnb": "BNB {v}", "el.bnbNeed": "需少量付 gas",
       "el.launched": "已开盘，不能再 mint", "el.notLaunched": "未开盘，可 mint",
       "el.progress": "已 mint {a}/{b}",
       "el.quota": "本地址剩余额度 {n} 次", "el.quotaSub": "上限 {m} 次，已用 {u}",
       "el.deadlineOk": "mint 未截止", "el.deadlineBad": "mint 已截止",
-      "el.allow": "已授权 {v} USDT", "el.allowSkip": "第 1 笔可跳过", "el.allowNeed": "需要先授权",
+      "el.allow": "已授权 {v} {sym}", "el.allowSkip": "第 1 笔可跳过", "el.allowNeed": "需要先授权",
       "el.loading": "正在读取链上数据…", "el.fail": "读取失败",
 
       "t.badAddr": "请填写 0x 地址或已注册的 .ai 名称",
@@ -243,31 +244,25 @@
    - 用 AGENT_ID() 指向的注册表（或 SPACE ID 注册表 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F 的 ownerOf(namehash("你的.agent.id"))）确认【当前这个 Agentic Wallet 地址】确实持有 .ai Agent ID。若持有者不是当前钱包，mint 必然 revert —— 请改用持有 Agent ID 的那个钱包，并告诉我。
 2) 用【刚刚读到的 PRICE()】重算：cost = PRICE × {count}；maxCost = cost × 1.1（留 10% 余量，防价格随铸造推进上涨）。若与下面写死的 maxCost 不一致，用新值重新生成下面两笔的调用数据后再 preview，不要沿用旧参数。
 
-第 1 笔：给 mint 合约授权 maxCost USDT（授权额度已够可跳过）
-  合约（USDT）: {uAddr}
-  approve(spender = {cAddr}, amount = maxCost USDT)
-  调用数据: {approveData}
-  baw contract-call preview --binanceChainId {chain} --to {uAddr} --inputData {approveData} --json
-
-第 2 笔：调用 mint 合约的 mint(uint256 shares, address referrer, uint256 maxCost)，一次性买 {count} 份（全部份数一笔完成，不要拆成多次）
+{approveBlock}{mintStepLabel}：调用 mint 合约的 mint(uint256 shares, address referrer, uint256 maxCost)，一次性买 {count} 份（全部份数一笔完成，不要拆成多次）
   shares   = {count}
   referrer = {ref}（来自 ?ref= 推广链接；推荐人须已 mint 过才生效，否则该笔不额外计奖）
-  maxCost  = 见上方重算值（实际花费约 {costText} USDT）
+  maxCost  = 见上方重算值（实际花费约 {costText} {paySymbol}）
   合约: {cAddr}
   调用数据: {mintData}
-  baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData} --json
+  baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData}{mintValueArg} --json
 
 若 preview 报 execution reverted：
 - 先读 revert 原因（如 maxCost too low / not launched / not eligible / cap reached）。
 - 若是 maxCost 不够，用最新 PRICE 提高 maxCost 后重新生成调用数据再 preview（这属于按链上状态重算，不是盲目重试）。
 - 若是 not eligible，说明当前钱包不持有 Agent ID，停下来告诉我。
-- 绝不能直接把 USDT 转到 mint 合约；只有 {cAddr} 收款。`,
+- {payNote}`,
     },
 
     en: {
       "brand.sub": "Agent ID exclusive mint · BSC",
       "ticker.text": "{price} USDT per share for {perMint} {sym} · mint requires a Binance Agent ID · {cap}-share hard cap · 3% buy/sell tax (1% burn + 1% USDT holder dividend + 1% LP) · refer a friend for +1 share",
-      "btn.connect": "Connect Binance Wallet",
+      "btn.connect": "Connect to verify ↗",
       "btn.walletMint": "Mint now",
       "wc.hint": "Connect the Binance wallet that holds your .ai Agent ID to mint directly on this page (approve + mint)",
       "wc.title": "Agent Wallet",
@@ -359,7 +354,7 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "label.tokenId": "Agent ID number (optional)",
       "ph.tokenId": "e.g. 1234",
       "label.count": "Mint count",
-      "hint.count": "Pick how many shares (1–10). The AI command mints them all in one transaction after approval",
+      "hint.count": "Up to 10 per transaction · Pick how many shares (1–10). The AI command mints them all in one transaction after approval",
       "adv.summary": "Advanced: contract / token params",
       "label.contract": "Contract", "label.usdt": "USDT contract", "label.nft": "Agent ID NFT",
       "btn.check": "Check eligibility", "btn.gen": "Generate command",
@@ -405,13 +400,13 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "el.addr": "Address",
       "el.name": "Agent ID name {n}", "el.resolved": "resolved to the address above",
       "el.nft": "Agent ID held: {n}", "el.nftBad": "You must hold one to mint",
-      "el.usdt": "USDT balance {v}", "el.usdtNeed": "need {v} USDT",
+      "el.usdt": "USDT balance {v}", "el.usdtNeed": "need {v} USDT", "el.payBal": "{sym} balance {v}", "el.payNeed": "need {v} {sym}",
       "el.bnb": "BNB {v}", "el.bnbNeed": "keep some for gas",
       "el.launched": "Already launched — mint closed", "el.notLaunched": "Not launched — mint open",
       "el.progress": "minted {a}/{b}",
       "el.quota": "Remaining quota: {n}", "el.quotaSub": "limit {m}, used {u}",
       "el.deadlineOk": "Mint window open", "el.deadlineBad": "Mint window closed",
-      "el.allow": "Allowance {v} USDT", "el.allowSkip": "step 1 can be skipped", "el.allowNeed": "approve first",
+      "el.allow": "Allowance {v} {sym}", "el.allowSkip": "step 1 can be skipped", "el.allowNeed": "approve first",
       "el.loading": "Reading on-chain data…", "el.fail": "Read failed",
 
       "t.badAddr": "Enter a 0x address or a registered .ai name",
@@ -475,25 +470,19 @@ Rules:
    - Using AGENT_ID()'s registry (or the SPACE ID registry 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F, ownerOf(namehash("your.agent.id"))), confirm that THIS Agentic Wallet address actually holds the .ai Agent ID. If the holder is a different wallet, mint will revert — switch to the wallet that holds the Agent ID and tell me.
 2) Recompute with the PRICE() you just read: cost = PRICE × {count}; maxCost = cost × 1.1 (10% headroom against price steps). If it differs from the maxCost written below, regenerate the calldata for both transactions with the new value before previewing. Do not use stale parameters.
 
-Tx 1: approve maxCost USDT to the mint contract (skip if allowance is already enough)
-  USDT contract: {uAddr}
-  approve(spender = {cAddr}, amount = maxCost USDT)
-  Input data: {approveData}
-  baw contract-call preview --binanceChainId {chain} --to {uAddr} --inputData {approveData} --json
-
-Tx 2: call mint(uint256 shares, address referrer, uint256 maxCost) on the mint contract — {count} shares in a SINGLE transaction (all shares at once, do NOT split into multiple mints)
+{approveBlock}{mintStepLabel}: call mint(uint256 shares, address referrer, uint256 maxCost) on the mint contract — {count} shares in a SINGLE transaction (all shares at once, do NOT split into multiple mints)
   shares   = {count}
   referrer = {ref} (from the ?ref= invite link; only counts if that referrer has minted before, otherwise no bonus)
-  maxCost  = see recompute above (actual cost ~ {costText} USDT)
+  maxCost  = see recompute above (actual cost ~ {costText} {paySymbol})
   Contract: {cAddr}
   Input data: {mintData}
-  baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData} --json
+  baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData}{mintValueArg} --json
 
 If preview reports "execution reverted":
 - Read the revert reason (e.g. maxCost too low / not launched / not eligible / cap reached).
 - If maxCost is too low, raise it using the latest PRICE and regenerate the calldata, then preview again (this is recomputing from chain state, not a blind retry).
 - If not eligible, the current wallet does not hold the Agent ID — stop and tell me.
-- Never transfer USDT directly to the mint contract. Always approve then call mint. {cAddr} is the only address that accepts payment.`,
+- {payNote}`,
     },
   };
 
@@ -540,22 +529,26 @@ If preview reports "execution reverted":
     } catch {}
   }
 
-  // 铸造次数 1~10（点选按钮组）
+  // 铸造次数 1~10（步进器 − 01 +，对应目标站 How many shares?）
   function buildCountOptions() {
     const box = $("count");
+    if (!box) return;
     box.innerHTML = "";
-    for (let i = 1; i <= 10; i++) {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = String(i);
-      b.dataset.v = String(i);
-      if (i === selectedCount) b.classList.add("active");
-      b.addEventListener("click", () => {
-        selectedCount = i;
-        box.querySelectorAll("button").forEach((x) => x.classList.toggle("active", x.dataset.v === String(i)));
-      });
-      box.appendChild(b);
-    }
+    const minus = document.createElement("button");
+    minus.type = "button"; minus.className = "step-btn"; minus.textContent = "−"; minus.setAttribute("aria-label", "减少");
+    const val = document.createElement("span");
+    val.className = "step-val"; val.id = "countVal";
+    const plus = document.createElement("button");
+    plus.type = "button"; plus.className = "step-btn"; plus.textContent = "+"; plus.setAttribute("aria-label", "增加");
+    const render = () => {
+      val.textContent = String(selectedCount).padStart(2, "0");
+      minus.disabled = selectedCount <= 1;
+      plus.disabled = selectedCount >= 10;
+    };
+    minus.addEventListener("click", () => { selectedCount = Math.max(1, selectedCount - 1); render(); updatePayTotal(); });
+    plus.addEventListener("click", () => { selectedCount = Math.min(10, selectedCount + 1); render(); updatePayTotal(); });
+    box.append(minus, val, plus);
+    render();
   }
 
   function paintHero() {
@@ -566,6 +559,7 @@ If preview reports "execution reverted":
     if ($("heroSymbol")) $("heroSymbol").textContent = CHAIN_SYMBOL;
     if ($("logoMark")) { const m = $("logoMark"); if (!m.querySelector("img")) { m.textContent = CHAIN_SYMBOL; m.classList.toggle("logo-sm", CHAIN_SYMBOL.length > 4); } }
     if ($("heroBadgeText")) { const b = $("heroBadgeText"); b.textContent = CHAIN_SYMBOL; b.classList.toggle("logo-sm", CHAIN_SYMBOL.length > 4); }
+    if ($("acName")) $("acName").textContent = CHAIN_NAME;
   }
 
   // 用链上身份刷新 <title> / hero / 安全检测卡，并重渲染带占位符的文案
@@ -579,6 +573,26 @@ If preview reports "execution reverted":
       $("secAddrLink").textContent = short;
     }
     applyLang(LANG);
+    // PAY WITH 标识按探测到的付款代币显示
+    const pw = document.querySelector(".pw-opt");
+    if (pw) pw.innerHTML = info && info.nativePay ? 'B BNB <i class="pw-check">✓</i>' : '₮ USDT <i class="pw-check">✓</i>';
+    if ($("payCost") && info && info.price != null) {
+      $("payCost").textContent = fmtPay(info.price) + " " + ((info && info.paySymbol) || "USDT");
+    }
+    updatePayTotal();
+  }
+
+  // 付款金额格式化（wei BigInt → 可读数字，按付款代币精度）
+  function fmtPay(v) {
+    return Number(ethers.formatUnits(v, Number(info && info.usdtDec) || 18)).toLocaleString("en-US", { maximumFractionDigits: 6 });
+  }
+
+  // Total cost = 份数 × 单价，随步进器联动
+  function updatePayTotal() {
+    const el = $("payTotal");
+    if (!el) return;
+    const sym = (info && info.paySymbol) || "USDT";
+    el.textContent = (info && info.price != null ? fmtPay(BigInt(info.price) * BigInt(selectedCount)) : "—") + " " + sym;
   }
 
   // 滚动条：克隆文案直到填满两屏宽，避免滚动时右侧出现空白
@@ -616,7 +630,7 @@ If preview reports "execution reverted":
   let account = null;
   let walletProvider = null; // 连上的钱包（注入的或 WalletConnect）
   let wcProvider = null;
-  let selectedCount = 1; // 点选的铸造份数（1–10）
+  let selectedCount = 10; // 点选的铸造份数（1–10），默认 10 份
   let lastCheck = null;
   let resolved = null; // { addr, name }
 
@@ -707,19 +721,33 @@ If preview reports "execution reverted":
         "function USDT() view returns (address)",
         "function AGENT_ID() view returns (address)",
         "function totalSupply() view returns (uint256)",
+        "event Mint(address indexed user, uint256 shares, address referrer)",
       ],
       p
     );
-    const u = new ethers.Contract(
-      await c.USDT(),
-      ["function decimals() view returns (uint8)", "function balanceOf(address) view returns (uint256)", "function allowance(address,address) view returns (uint256)"],
-      p
-    );
+    // 探测付款代币：优先用合约 USDT()（ERC20）；若合约无此函数或返回 0，则视为原生 BNB 付款
+    let u = null, nativePay = false, paySymbol = "USDT", payToken = null, usdtDec = 18;
+    try {
+      const tk = await c.USDT();
+      if (tk && tk !== ethers.ZeroAddress) {
+        payToken = tk;
+        u = new ethers.Contract(tk, [
+          "function decimals() view returns (uint8)",
+          "function balanceOf(address) view returns (uint256)",
+          "function allowance(address,address) view returns (uint256)",
+        ], p);
+        usdtDec = Number(await u.decimals());
+      } else {
+        nativePay = true; paySymbol = "BNB";
+      }
+    } catch {
+      nativePay = true; paySymbol = "BNB";
+    }
 
-    const [name, symbol, price, perMint, maxSharesPerId, totalSharesCap, totalSharesMinted, launched, usdtDec, nft] =
+    const [name, symbol, price, perMint, maxSharesPerId, totalSharesCap, totalSharesMinted, launched, nft] =
       await Promise.all([
         c.name(), c.symbol(), c.PRICE(), c.PER_MINT(), c.maxSharesPerId(), c.totalSharesCap(),
-        c.totalSharesMinted(), c.launched(), u.decimals(), c.AGENT_ID(),
+        c.totalSharesMinted(), c.launched(), c.AGENT_ID(),
       ]);
 
     // 兼容旧字段名（info / heroVals / updateProgress 仍引用这些名）
@@ -739,7 +767,7 @@ If preview reports "execution reverted":
     const code = await provider.getCode(await c.getAddress()).catch(() => "0x");
     const mintVer = code && code.includes("836a1040") ? "shares" : "single";
 
-    info = { c, u, contract: await c.getAddress(), name: name || "火星币", symbol: symbol || "火星币", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer };
+    info = { c, u, contract: await c.getAddress(), name: name || "火星币", symbol: symbol || "火星币", price, perMint, maxPerWallet, maxMints, mintCount, deadline, launched, usdtDec, nft, usdtRaised, totalSupply, maxSupply, mintVer, nativePay, paySymbol, payToken };
 
     CHAIN_NAME = name || "火星币";
     CHAIN_SYMBOL = symbol || "火星币";
@@ -754,10 +782,93 @@ If preview reports "execution reverted":
     saveHeroCache(info.contract, heroVals);
     paintHero();
     paintIdentity();
-    $("usdt").value = await info.u.getAddress();
+    if (info.u) $("usdt").value = await info.u.getAddress();
     $("nft").value = nft;
     updateProgress();
+    loadMintRanking().catch(() => {});
     return info;
+  }
+
+  /* ---------- 铸造排行榜 ---------- */
+  const MINT_TOPIC = ethers.id("Mint(address,uint256,address)");
+
+  async function loadMintRanking() {
+    const tb = $("rankBody");
+    if (tb) tb.innerHTML = '<tr><td colspan="4" class="rank-empty">加载中…</td></tr>';
+    if (!info || !info.c) return;
+    // 有 BscScan Key 优先走 BscScan（一次请求拿最近 10 条，不限区块跨度）
+    if (CONFIG.BSCSCAN_API_KEY) {
+      try { return await loadRankingBscScan(); }
+      catch (e) { console.warn("[铸造排行榜] BscScan 失败，回退链上查询：", e); }
+    }
+    await loadRankingChain();
+  }
+
+  async function loadRankingBscScan() {
+    const addr = info.contract;
+    const url = `https://api.bscscan.com/api?module=logs&action=getLogs&address=${addr}`
+      + `&topic0=${MINT_TOPIC}&fromBlock=0&toBlock=latest&page=1&offset=10&sort=desc`
+      + `&apikey=${CONFIG.BSCSCAN_API_KEY}`;
+    const res = await fetch(url);
+    const j = await res.json();
+    if (j.status !== "1" || !Array.isArray(j.result)) throw new Error(j.message || "BscScan error");
+    const rows = j.result.slice(0, 10).map((it) => {
+      const parsed = info.c.interface.parseLog({ topics: it.topics, data: it.data });
+      const shares = parsed.args.shares;
+      return { user: parsed.args.user, shares, amt: shares * info.price, ts: BigInt(it.timeStamp || 0) };
+    });
+    renderRanking(rows);
+  }
+
+  async function loadRankingChain() {
+    try {
+      const bn = await provider.getBlockNumber();
+      // BSC 公共节点对单次 eth_getLogs 的区块跨度有限制，分段查询（每段 1 万块）避免超限
+      const STEP = 10000n;
+      const MAX_SEG = 200;
+      let logs = [];
+      let to = bn;
+      for (let i = 0; i < MAX_SEG; i++) {
+        const from = to - STEP + 1n < 0n ? 0n : to - STEP + 1n;
+        let seg = [];
+        try { seg = await info.c.queryFilter(info.c.filters.Mint(), from, to); }
+        catch (e) { /* 该段受限则跳过，继续往前 */ }
+        logs = logs.concat(seg);
+        if (logs.length >= 10) break;
+        if (to <= STEP) break;
+        to = to - STEP;
+      }
+      const recent = logs.slice(-10).reverse();
+      const rows = await Promise.all(recent.map(async (l) => {
+        const b = await provider.getBlock(l.blockNumber).catch(() => null);
+        const shares = l.args.shares;
+        const amt = shares * info.price;
+        return { user: l.args.user, shares, amt, ts: b ? b.timestamp : 0n };
+      }));
+      renderRanking(rows);
+    } catch (e) {
+      console.warn("[铸造排行榜] 链上查询失败：", e);
+      renderRanking(null, "查询失败，请稍后再试");
+    }
+  }
+
+  function renderRanking(rows, errMsg) {
+    const tb = $("rankBody");
+    if (!tb) return;
+    if (errMsg) {
+      tb.innerHTML = `<tr><td colspan="4" class="rank-empty">${errMsg}</td></tr>`;
+      return;
+    }
+    if (!rows || !rows.length) {
+      tb.innerHTML = '<tr><td colspan="4" class="rank-empty">暂无铸造记录</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map((r, i) => {
+      const addr = shortAddr(r.user);
+      const time = r.ts ? new Date(Number(r.ts) * 1000).toLocaleString() : "-";
+      const amt = ethers.formatUnits(r.amt, info.usdtDec);
+      return `<tr><td>${i + 1}</td><td class="rank-addr" title="${r.user}">${addr}</td><td>${time}</td><td>${amt}</td></tr>`;
+    }).join("");
   }
 
   /* ---------- Mint 进度 ---------- */
@@ -778,7 +889,7 @@ If preview reports "execution reverted":
     $("prog_of").textContent = t("prog.of", { a: String(mintCount), b: String(maxMints) });
     $("prog_status").textContent = txt;
     $("prog_status").className = "status " + cls;
-    $("prog_raised").textContent = Number(ethers.formatUnits(usdtRaised, usdtDec)).toLocaleString("en-US") + " USDT";
+    $("prog_raised").textContent = Number(ethers.formatUnits(usdtRaised, usdtDec)).toLocaleString("en-US") + " " + (info.paySymbol || "USDT");
     const supplyTxt = Number(ethers.formatUnits(totalSupply, 18)).toLocaleString("en-US") + " " + symbol;
     $("prog_supply").textContent = maxSupply > 0n
       ? t("prog.cap", { s: supplyTxt, c: Number(ethers.formatUnits(maxSupply, 18)).toLocaleString("en-US") })
@@ -802,14 +913,14 @@ If preview reports "execution reverted":
       row(true, t("el.addr"), d.a),
       ...(d.name ? [row(true, t("el.name", { n: d.name }), t("el.resolved"))] : []),
       row(Number(d.nftBal) > 0, t("el.nft", { n: String(d.nftBal) }), Number(d.nftBal) > 0 ? "" : t("el.nftBad")),
-      row(d.usdtBal >= d.need, t("el.usdt", { v: d.fmtU(d.usdtBal) }), t("el.usdtNeed", { v: d.fmtU(d.need) })),
+      row(d.payBal >= d.need, t("el.payBal", { sym: d.paySymbol, v: d.fmtU(d.payBal) }), t("el.payNeed", { sym: d.paySymbol, v: d.fmtU(d.need) })),
       row(d.bnb > 0n, t("el.bnb", { v: Number(ethers.formatEther(d.bnb)).toFixed(5) }), t("el.bnbNeed")),
       row(!d.launched, d.launched ? t("el.launched") : t("el.notLaunched"), t("el.progress", { a: String(d.mintCount), b: String(d.maxMints) })),
       row(d.left >= d.count, t("el.quota", { n: String(d.left) }),
         t("el.quotaSub", { m: String(d.maxPerWallet), u: String(d.minted) }) +
         (Number(d.refBonus) > 0 ? (LANG === "zh" ? " · 推广加成 +" + d.refBonus + " 份" : " · referral +" + d.refBonus) : "")),
       row(d.deadline > d.now, d.deadline > d.now ? t("el.deadlineOk") : t("el.deadlineBad"), new Date(d.deadline * 1000).toLocaleString()),
-      row(d.allowance >= d.need, t("el.allow", { v: d.fmtU(d.allowance) }), d.allowance >= d.need ? t("el.allowSkip") : t("el.allowNeed")),
+      ...(d.nativePay ? [] : [row(d.allowance >= d.need, t("el.allow", { v: d.fmtU(d.allowance), sym: d.paySymbol }), d.allowance >= d.need ? t("el.allowSkip") : t("el.allowNeed"))]),
     ];
     $("elig").innerHTML = rows.join("");
     $("elig").classList.add("show");
@@ -828,14 +939,19 @@ If preview reports "execution reverted":
       const nft = new ethers.Contract(i.nft, ["function balanceOf(address) view returns (uint256)"], provider);
 
       const [nftBal, usdtBal, bnb, minted, refBonus, allowance] = await Promise.all([
-        nft.balanceOf(a), i.u.balanceOf(a), provider.getBalance(a),
-        i.c.mintedShares(a), i.c.referralBonus(a), i.u.allowance(a, i.contract),
+        nft.balanceOf(a),
+        i.nativePay ? 0n : i.u.balanceOf(a),
+        provider.getBalance(a),
+        i.c.mintedShares(a), i.c.referralBonus(a),
+        i.nativePay ? 0n : i.u.allowance(a, i.contract),
       ]);
 
       const fmtU = (v) => Number(ethers.formatUnits(v, Number(i.usdtDec))).toLocaleString("en-US", { maximumFractionDigits: 6 });
       const userMax = Number(i.maxPerWallet) + Number(refBonus); // 基础上限 + 推广加成
+      const payBal = i.nativePay ? bnb : usdtBal;
       lastCheck = {
-        a, name: r.name, count, need, nftBal, usdtBal, bnb, minted, refBonus, allowance, fmtU,
+        a, name: r.name, count, need, nftBal, usdtBal, payBal, bnb, minted, refBonus, allowance, fmtU,
+        nativePay: i.nativePay, paySymbol: i.paySymbol || "USDT",
         launched: i.launched, mintCount: i.mintCount, maxMints: i.maxMints,
         basePerWallet: Number(i.maxPerWallet), maxPerWallet: userMax,
         left: userMax - Number(minted), deadline: Number(i.deadline), now: Math.floor(Date.now() / 1000),
@@ -853,7 +969,8 @@ If preview reports "execution reverted":
   function buildCommand() {
     const count = selectedCount;
     const cAddr = ethers.getAddress($("contract").value.trim());
-    const uAddr = ethers.getAddress($("usdt").value.trim());
+    const nativePay = info ? !!info.nativePay : false;
+    const paySymbol = (info && info.paySymbol) || "USDT";
     const dec = info ? Number(info.usdtDec) : 18;
     const price = info ? BigInt(info.price) : ethers.parseUnits("1", dec);
     const perMint = info ? Number(ethers.formatUnits(info.perMint, 18)).toLocaleString("en-US") : "21,000";
@@ -866,17 +983,34 @@ If preview reports "execution reverted":
     const name = info && info.name ? info.name : CHAIN_NAME;
     const totalText = Number(ethers.formatUnits(BigInt(info ? info.perMint : 0n) * shares, 18)).toLocaleString("en-US");
 
-    // approve(mint 合约, maxCost)
+    const uAddr = !nativePay ? ethers.getAddress($("usdt").value.trim()) : "";
     const approveData = "0x095ea7b3" + ethers.AbiCoder.defaultAbiCoder().encode(["address", "uint256"], [cAddr, maxCost]).slice(2);
-    // mint(shares, referrer, maxCost) —— 一次交易买 count 份，不分多次
+    // mint(shares, referrer, maxCost) —— 一次交易买 count 份，不分多次（原生 BNB 时通过交易 value 付 maxCost）
     const mintData = MINT_SIG + ethers.AbiCoder.defaultAbiCoder()
       .encode(["uint256", "address", "uint256"], [shares, defaultReferrer, maxCost]).slice(2);
+
+    // 按付款方式生成命令片段
+    const mintStepLabel = nativePay
+      ? (LANG === "zh" ? "第 1 笔" : "Tx 1")
+      : (LANG === "zh" ? "第 2 笔" : "Tx 2");
+    const mintValueArg = nativePay ? ` --value ${amountText} ${paySymbol}` : "";
+    const approveBlock = nativePay ? "" : (LANG === "zh"
+      ? `第 1 笔：给 mint 合约授权 maxCost ${paySymbol}（授权额度已够可跳过）\n  合约（${paySymbol}）: ${uAddr}\n  approve(spender = ${cAddr}, amount = maxCost ${paySymbol})\n  调用数据: ${approveData}\n  baw contract-call preview --binanceChainId ${CHAIN_ID} --to ${uAddr} --inputData ${approveData} --json\n\n`
+      : `Tx 1: approve maxCost ${paySymbol} to the mint contract (skip if allowance is already enough)\n  ${paySymbol} contract: ${uAddr}\n  approve(spender = ${cAddr}, amount = maxCost ${paySymbol})\n  Input data: ${approveData}\n  baw contract-call preview --binanceChainId ${CHAIN_ID} --to ${uAddr} --inputData ${approveData} --json\n\n`);
+    const payNote = nativePay
+      ? (LANG === "zh"
+          ? `绝不能直接把 ${paySymbol} 转给 mint 合约；铸造以交易 value 支付 ${paySymbol}，只有 ${cAddr} 收款。`
+          : `Never send ${paySymbol} directly to the mint contract. Payment is made via the transaction value; ${cAddr} is the only address that accepts payment.`)
+      : (LANG === "zh"
+          ? `绝不能直接把 ${paySymbol} 转到 mint 合约；只有 ${cAddr} 收款。`
+          : `Never transfer ${paySymbol} directly to the mint contract. ${cAddr} is the only address that accepts payment.`);
 
     const idLine = "";
     const vars = {
       chain: String(CHAIN_ID), idLine, amountText, uAddr, approveData,
       cAddr, mintData, mintSig: MINT_SIG, count: String(count), priceText,
       costText, totalText, perMint, name, ref: defaultReferrer,
+      approveBlock, mintStepLabel, mintValueArg, payNote, paySymbol,
     };
 
     return t("cmd.body", vars);
@@ -1169,8 +1303,15 @@ If preview reports "execution reverted":
     account = addr;
     if ($("addr")) $("addr").value = addr;
     resolved = { addr, name: null };
+    const short = shortAddr(addr);
     const cb = $("connectBtn");
-    if (cb) cb.textContent = shortAddr(addr);
+    if (cb) cb.textContent = short;
+    const tcb = $("topConnectBtn");
+    if (tcb) tcb.innerHTML = short + ' <span class="arrow">↗</span>';
+    const tst = $("topWalletStatus");
+    if (tst) { tst.textContent = "钱包已连接"; tst.classList.add("ok"); }
+    const acs = $("acStatus");
+    if (acs) { acs.textContent = "已连接 · " + short; acs.classList.add("ok"); }
     refreshWallet();
   }
 
@@ -1200,6 +1341,8 @@ If preview reports "execution reverted":
       if (leftEl) leftEl.textContent = LANG === "zh"
         ? left + " 次（基础 " + base + " + 推广 " + Number(refBonus) + "）"
         : left + " (base " + base + " + referral " + Number(refBonus) + ")";
+      const quotaEl = $("payQuota");
+      if (quotaEl) quotaEl.textContent = left + " / " + userMax;
     } catch (e) {
       if (leftEl) leftEl.textContent = "—";
     }
@@ -1437,6 +1580,18 @@ If preview reports "execution reverted":
   const _connectBtn = $("connectBtn");
   if (_connectBtn) _connectBtn.addEventListener("click", connect);
 
+  // 右上角连接钱包按钮（复用同一套 connect 逻辑）
+  const _topConnectBtn = $("topConnectBtn");
+  if (_topConnectBtn) _topConnectBtn.addEventListener("click", connect);
+
+  // PAY WITH 代币切换（视觉高亮，铸造仍以 USDT 为准）
+  document.querySelectorAll(".pw-opt").forEach((opt) => {
+    opt.addEventListener("click", () => {
+      document.querySelectorAll(".pw-opt").forEach((x) => x.classList.remove("active"));
+      opt.classList.add("active");
+    });
+  });
+
   // 刷新网页后自动重连：已授权的注入式钱包无需再点「连接钱包」，且切换账户/网络会自动同步
   (function autoReconnect() {
     const w = injectedWallet() || window.ethereum;
@@ -1452,7 +1607,13 @@ If preview reports "execution reverted":
           account = null;
           walletProvider = null;
           const cb = $("connectBtn");
-          if (cb) cb.textContent = "连接钱包";
+          if (cb) cb.textContent = "连接以验证 ↗";
+          const tcb = $("topConnectBtn");
+          if (tcb) tcb.innerHTML = '连接钱包 <span class="arrow">↗</span>';
+          const tst = $("topWalletStatus");
+          if (tst) { tst.textContent = "钱包未连接"; tst.classList.remove("ok"); }
+          const acs = $("acStatus");
+          if (acs) { acs.textContent = "需要持有 .ai Agent ID 才能铸造。"; acs.classList.remove("ok"); }
           connMsg("已断开钱包");
           const panel = $("walletPanel");
           if (panel) panel.classList.add("hidden");

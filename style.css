@@ -65,7 +65,11 @@ body {
 .hero p { margin: 0; color: var(--muted); font-size: 14px; }
 .hero b { color: var(--text); }
 
-main { max-width: 1120px; margin: 0 auto; padding: 10px 24px 60px; }
+main { max-width: 1120px; margin: 0 auto; padding: 10px 24px 60px; display: flex; flex-direction: column; }
+
+/* 把「铸造区 + AI 指令」卡片提到内容区最上方 */
+#connMsg { order: -2; }
+.grid { order: -1; }
 
 /* Mint 进度卡片 */
 .prog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -529,4 +533,108 @@ body::after {
 @media (max-width: 560px) {
   .hero-cta .btn { min-width: 130px; }
   .tok-bar { min-width: 60px; }
+}
+
+/* ===== 顶栏右上角连接钱包（对应目标站 Connect wallet ↗） ===== */
+.wallet-top { display: flex; align-items: center; gap: 10px; }
+.wallet-status {
+  font-size: 11.5px; color: var(--muted); white-space: nowrap;
+  padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: rgba(255,255,255,.03);
+}
+.wallet-status.ok { color: var(--ok); border-color: rgba(33,192,122,.4); background: rgba(33,192,122,.1); }
+.btn-connect {
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  color: #080b14; border-color: transparent; font-weight: 700;
+  padding: 9px 15px; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-connect .arrow { font-size: 12px; }
+
+/* ===== 铸造区：Agent ID 凭证块（对应目标站 AGENT ID 区） ===== */
+.agent-cred {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px;
+  padding: 14px 16px; margin: 2px 0 16px;
+  border: 1px solid rgba(255,122,24,.32); border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,122,24,.1), rgba(255,122,24,.03));
+}
+.ac-badge {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 78px; height: 78px; border-radius: 14px; line-height: 1.05; text-align: center;
+  background: #0b101c; border: 1px solid rgba(255,122,24,.35);
+  box-shadow: 0 0 18px rgba(255,122,24,.18);
+}
+.ac-k { font-size: 9.5px; letter-spacing: .14em; color: var(--muted); }
+.ac-v { font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--gold); }
+.ac-main { min-width: 0; }
+.ac-name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.ai-dot {
+  font-size: 10px; font-weight: 800; color: #080b14; padding: 2px 7px; border-radius: 6px;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+}
+.ac-sub { font-size: 11px; color: var(--muted); margin-top: 5px; letter-spacing: .03em; }
+.ac-status { font-size: 12px; margin-top: 6px; color: var(--danger); }
+.ac-status.ok { color: var(--ok); }
+.agent-cred .btn { white-space: nowrap; }
+
+/* 钱包面板（连接后信息） */
+.wp-panel {
+  margin: 4px 0 16px; padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(255,255,255,.04);
+}
+.wp-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+.wp-promo { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,.18); }
+.wp-linkrow { display: flex; gap: 8px; margin-top: 8px; }
+.wp-linkrow input { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: #e8eaf0; font-size: 12px; }
+
+/* 份额步进器（− 01 +） */
+.stepper { display: inline-flex; align-items: center; gap: 14px; }
+.stepper .step-btn {
+  width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font: inherit; font-size: 20px; font-weight: 700;
+  border: 1px solid #2a3142; background: #0e1422; color: #cdd6e6; transition: .15s;
+}
+.stepper .step-btn:hover:not(:disabled) { border-color: #ff9a40; color: #ff9a40; }
+.stepper .step-btn:disabled { opacity: .35; cursor: not-allowed; }
+.stepper .step-val {
+  min-width: 42px; text-align: center; font-size: 22px; font-weight: 800; color: var(--gold);
+  font-family: ui-monospace, Consolas, monospace; letter-spacing: .04em;
+}
+.count-fixed {
+  display: inline-block; min-width: 56px; text-align: center; font-size: 22px; font-weight: 800; color: var(--gold);
+  font-family: ui-monospace, Consolas, monospace; letter-spacing: .04em;
+  padding: 4px 16px; border: 1px solid #2a3142; border-radius: 10px; background: #0e1422;
+}
+
+/* 支付面板（PAY WITH / Share cost / quota） */
+.pay-panel {
+  margin: 4px 0 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #0b101c;
+}
+.pay-with { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pw-label { font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+.pw-opts { display: flex; gap: 8px; flex: 1; }
+.pw-opt {
+  flex: 1; padding: 9px 12px; cursor: pointer; font: inherit; font-weight: 600; font-size: 13px;
+  border: 1px solid #2a3142; background: #0e1422; color: #cdd6e6; border-radius: 10px; transition: .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.pw-opt:hover { border-color: #ff9a40; }
+.pw-opt.active { background: rgba(255,122,24,.16); border-color: var(--gold); color: var(--gold); }
+.pw-check { font-style: normal; font-size: 12px; }
+.pay-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; font-size: 13px; }
+.pay-row span { color: var(--muted); }
+.pay-row b { font-size: 14px; color: var(--text); }
+.pay-row.pay-muted b { color: var(--muted); font-weight: 600; }
+
+/* Payment details 提示框（对应目标站指令/说明区） */
+.pay-detail {
+  padding: 12px 14px; margin: 4px 0 6px; border: 1px solid rgba(255,122,24,.3); border-radius: 10px;
+  background: rgba(255,122,24,.06);
+}
+.pay-detail b { display: block; font-size: 12.5px; color: var(--gold); margin-bottom: 6px; letter-spacing: .02em; }
+.pay-detail p { margin: 0; font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+
+@media (max-width: 600px) {
+  .agent-cred { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .agent-cred .btn { width: 100%; }
+  .topbar-actions { gap: 8px; }
+  .wallet-top { order: -1; }
 }
