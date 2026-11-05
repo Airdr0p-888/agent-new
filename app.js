@@ -17,25 +17,21 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E",
+    CONTRACT: "0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
     BSCSCAN_API_KEY: "", // 留空走链上分段查询；填入 BscScan 免费 API Key 则走 BscScan（更快、不限区块）
   };
 
-  // 推广链接 ?ref=0x... 读取（作为默认推荐人；实际是否生效以链上 isMinted[ref] 为准）
+  // 推荐人：邀请机制已移除，统一传零地址（合约 mint 仍需要 referrer 参数）
   let defaultReferrer = ethers.ZeroAddress;
-  try {
-    const _ref = new URLSearchParams(location.search).get("ref");
-    if (_ref && ethers.isAddress(_ref)) defaultReferrer = ethers.getAddress(_ref);
-  } catch {}
 
   /* ---------------- 多语言 ---------------- */
 
   const I18N = {
     zh: {
       "brand.sub": "Agent ID 专属铸造 · BSC",
-      "ticker.text": "每份 {price} USDT 换 {perMint} 枚 {sym} · 持有币安 Agent ID 才能铸造 · {cap} 份硬顶 · 买卖 3% 税费（1% 销毁 + 1% 持币分红 USDT + 1% 回流 LP） · 推广一人多 1 份",
+      "ticker.text": "每份 {price} USDT 换 {perMint} 枚 {sym} · 持有币安 Agent ID 才能铸造 · {cap} 份硬顶 · 买卖 3% 税费（1% 销毁 + 1% 持币分红 USDT + 1% 回流 LP）",
       "btn.connect": "连接以验证 ↗",
       "btn.walletMint": "一键铸造（Mint）",
       "wc.hint": "连接持有你 .ai Agent ID 的币安钱包，即可在本页直接铸造（approve + mint 两笔交易）",
@@ -254,7 +250,7 @@
 
 {approveBlock}{mintStepLabel}：调用 mint 合约的 mint(uint256 shares, address referrer, uint256 maxCost)，一次性买 {count} 份（全部份数一笔完成，不要拆成多次）
   shares   = {count}
-  referrer = {ref}（来自 ?ref= 推广链接；推荐人须已 mint 过才生效，否则该笔不额外计奖）
+  referrer = {ref}（邀请机制已移除，这里传零地址）
   maxCost  = 见上方重算值（实际花费约 {costText} {paySymbol}）
   合约: {cAddr}
   调用数据: {mintData}
@@ -269,7 +265,7 @@
 
     en: {
       "brand.sub": "Agent ID exclusive mint · BSC",
-      "ticker.text": "{price} USDT per share for {perMint} {sym} · mint requires a Binance Agent ID · {cap}-share hard cap · 3% buy/sell tax (1% burn + 1% USDT holder dividend + 1% LP) · refer a friend for +1 share",
+      "ticker.text": "{price} USDT per share for {perMint} {sym} · mint requires a Binance Agent ID · {cap}-share hard cap · 3% buy/sell tax (1% burn + 1% USDT holder dividend + 1% LP)",
       "btn.connect": "Connect to verify ↗",
       "btn.walletMint": "Mint now",
       "wc.hint": "Connect the Binance wallet that holds your .ai Agent ID to mint directly on this page (approve + mint)",
@@ -488,7 +484,7 @@ Rules:
 
 {approveBlock}{mintStepLabel}: call mint(uint256 shares, address referrer, uint256 maxCost) on the mint contract — {count} shares in a SINGLE transaction (all shares at once, do NOT split into multiple mints)
   shares   = {count}
-  referrer = {ref} (from the ?ref= invite link; only counts if that referrer has minted before, otherwise no bonus)
+  referrer = {ref} (invite mechanism removed; zero address passed here)
   maxCost  = see recompute above (actual cost ~ {costText} {paySymbol})
   Contract: {cAddr}
   Input data: {mintData}
@@ -934,8 +930,7 @@ If preview reports "execution reverted":
       row(d.bnb > 0n, t("el.bnb", { v: Number(ethers.formatEther(d.bnb)).toFixed(5) }), t("el.bnbNeed")),
       row(!d.launched, d.launched ? t("el.launched") : t("el.notLaunched"), t("el.progress", { a: String(d.mintCount), b: String(d.maxMints) })),
       row(d.left >= d.count, t("el.quota", { n: String(d.left) }),
-        t("el.quotaSub", { m: String(d.maxPerWallet), u: String(d.minted) }) +
-        (Number(d.refBonus) > 0 ? (LANG === "zh" ? " · 推广加成 +" + d.refBonus + " 份" : " · referral +" + d.refBonus) : "")),
+        t("el.quotaSub", { m: String(d.maxPerWallet), u: String(d.minted) })),
       row(d.deadline > d.now, d.deadline > d.now ? t("el.deadlineOk") : t("el.deadlineBad"), new Date(d.deadline * 1000).toLocaleString()),
       ...(d.nativePay ? [] : [row(d.allowance >= d.need, t("el.allow", { v: d.fmtU(d.allowance), sym: d.paySymbol }), d.allowance >= d.need ? t("el.allowSkip") : t("el.allowNeed"))]),
     ];
@@ -1429,7 +1424,7 @@ If preview reports "execution reverted":
     refreshWallet();
   }
 
-  // 连接钱包后展示：剩余可 Mint 次数（基础 + 推广）与专属推广链接
+  // 连接钱包后展示：剩余可 Mint 次数
   async function refreshWallet() {
     if (!account) return;
     const panel = $("walletPanel");
@@ -1440,23 +1435,15 @@ If preview reports "execution reverted":
     if (hint) hint.classList.add("hidden");
     const addrEl = $("wpAddr");
     if (addrEl) addrEl.textContent = shortAddr(account);
-    const link = location.origin + location.pathname + "?ref=" + account;
-    const linkEl = $("wpLink");
-    if (linkEl) linkEl.value = link;
     const leftEl = $("wpLeft");
     try {
       const i = info || (await loadInfo());
-      const [minted, refBonus] = await Promise.all([
-        i.c.mintedShares(account), i.c.referralBonus(account),
-      ]);
+      const minted = await i.c.mintedShares(account);
       const base = Number(i.maxPerWallet);
-      const userMax = base + Number(refBonus);
-      const left = Math.max(0, userMax - Number(minted));
-      if (leftEl) leftEl.textContent = LANG === "zh"
-        ? left + " 次（基础 " + base + " + 推广 " + Number(refBonus) + "）"
-        : left + " (base " + base + " + referral " + Number(refBonus) + ")";
+      const left = Math.max(0, base - Number(minted));
+      if (leftEl) leftEl.textContent = LANG === "zh" ? left + " 次" : left + " mints";
       const quotaEl = $("payQuota");
-      if (quotaEl) quotaEl.textContent = left + " / " + userMax;
+      if (quotaEl) quotaEl.textContent = left + " / " + base;
     } catch (e) {
       if (leftEl) leftEl.textContent = "—";
     }
@@ -1851,12 +1838,6 @@ If preview reports "execution reverted":
   $("genBtn").addEventListener("click", generate);
   $("copyBtn").addEventListener("click", copyCmd);
   $("mintBtn").addEventListener("click", mintWithWallet);
-  if ($("wpCopy")) $("wpCopy").addEventListener("click", async () => {
-    const linkEl = $("wpLink");
-    if (!linkEl) return;
-    try { await navigator.clipboard.writeText(linkEl.value); toast(t("t.copyLink"), "ok"); }
-    catch { toast(t("t.copyLinkFail"), "err"); }
-  });
 
   // 合约地址支持 URL 参数 ?contract=0x... 动态指定（覆盖源码默认值，部署新合约免改源码）
   try {

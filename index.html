@@ -29,6 +29,7 @@
   </div>
   <div class="topbar-actions">
     <a class="btn btn-icon" href="https://x.com/marscoin_bsc1" target="_blank" rel="noopener" aria-label="X / Twitter"><i class="ic ic-x">X</i></a>
+    <a class="btn btn-ghost" href="whitepaper.html">白皮书</a>
     <button id="langBtn" class="btn btn-ghost" title="中文 / English">EN</button>
     <span class="wallet-status" id="topWalletStatus">未连接</span>
     <button id="topConnectBtn" class="btn btn-connect" type="button">连接钱包</button>
@@ -79,7 +80,7 @@
   <div class="card">
     <div class="sec-head">
       <h3 data-i18n="sec.title">合约安全检测</h3>
-      <a class="btn btn-mini" href="https://bscscan.com/address/0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
+      <a class="btn btn-mini" href="https://bscscan.com/address/0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35" target="_blank" rel="noopener" data-i18n="sec.verify">BscScan 核验</a>
     </div>
     <div class="sec-top">
       <div class="sec-score">
@@ -88,7 +89,7 @@
         <small data-i18n="sec.badges">高危 0 · 中危 0 · 提示 2</small>
       </div>
       <div class="sec-rows">
-        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">火星币</span> (<a id="secAddrLink" href="https://bscscan.com/address/0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E" target="_blank" rel="noopener">0x8FF0…Ac7E</a>)</b></div>
+        <div><span data-i18n="sec.contract">合约</span><b><span id="secName">火星币</span> (<a id="secAddrLink" href="https://bscscan.com/address/0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35" target="_blank" rel="noopener">0xAEB9…cF35</a>)</b></div>
         <div><span data-i18n="sec.creator">创建者 / 拥有者</span><b>0xF6…9423</b></div>
         <div><span data-i18n="sec.liquidity">开盘动作</span><b data-i18n="sec.liquidityV">等量代币 + 募集 USDT 注入 PancakeSwap V2 交易对</b></div>
       </div>
@@ -134,18 +135,10 @@
       </div>
 
       <div id="walletPanel" class="wp-panel">
-        <p id="wpHint" class="hint">连接钱包后，这里会自动生成你的专属推广链接（?ref=你的地址），并显示剩余可铸造次数。</p>
+        <p id="wpHint" class="hint">连接钱包后，这里会显示剩余可铸造次数。</p>
         <div id="wpBody" class="hidden">
           <div class="wp-row"><span>已连接钱包</span><b id="wpAddr"></b></div>
           <div class="wp-row"><span>剩余可 Mint</span><b id="wpLeft">—</b></div>
-          <div class="wp-promo">
-            <b>我的推广链接</b>
-            <p class="hint" style="margin:6px 0 0">分享此链接，好友经它铸造，每成功推荐 1 位已铸造者，你的 Mint 额度 +1 份</p>
-            <div class="wp-linkrow">
-              <input id="wpLink" readonly />
-              <button id="wpCopy" class="btn btn-mini">复制</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -187,10 +180,6 @@
       <p data-i18n="faq.a2">开盘前铸造的代币不可转账；合约达到铸造目标后自动开盘，注入 PancakeSwap 后即可交易。</p>
     </details>
     <details>
-      <summary data-i18n="faq.q3">推广奖励怎么算？</summary>
-      <p data-i18n="faq.a3">分享你的专属推广链接（连接钱包后自动生成），每成功推荐 1 位已铸造者，你的额度 +1 份。</p>
-    </details>
-    <details>
       <summary data-i18n="faq.q4">资金安全吗？</summary>
       <p data-i18n="faq.a4">铸造资金 100% 注入 LP 底池，LP 发射后自动打入黑洞，合约无任何提取权限，全程链上可查。</p>
     </details>
@@ -208,7 +197,7 @@
   <!-- 合约 / 代币参数（置底，常驻展示，不再折叠） -->
   <div class="card">
     <h3>合约 / 代币参数</h3>
-    <div class="field"><label>合约地址</label><input id="contract" value="0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E" /></div>
+    <div class="field"><label>合约地址</label><input id="contract" value="0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35" /></div>
     <div class="field"><label>USDT 合约</label><input id="usdt" value="0x55d398326f99059fF775485246999027B3197955" /></div>
     <div class="field"><label>Agent ID NFT</label><input id="nft" value="0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F" /></div>
   </div>
@@ -216,7 +205,7 @@
   <!-- 底部操作入口 -->
   <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:8px 0 4px">
     <a href="#mint" class="btn btn-primary btn-lg">立即铸造</a>
-    <a href="https://bscscan.com/address/0x8FF00Ab1C7e7C517B99Dd3d689bccee49e61Ac7E" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">BscScan 核验</a>
+    <a href="https://bscscan.com/address/0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">BscScan 核验</a>
   </div>
 
 </main>
