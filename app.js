@@ -89,7 +89,8 @@
       "wc.needInfo": "链上参数还没读到，请稍等再试",
       "tx.mint": "铸造交易",
       "tx.approve": "授权交易",
-      "tx.gas": "gas",
+      "tx.gas": "矿工费",
+      "tx.detail": "交易明细",
       "cmd.body.legacy": `我有币安 Agentic Wallet，请在 BSC（binanceChainId {chain}）上帮我铸造 {name}。
 我的钱包地址：{addr}{idLine}
 
@@ -209,7 +210,7 @@
       "t.approving": "正在授权 USDT…",
       "t.approveOk": "授权成功",
       "t.minting": "铸造交易已提交，等待确认…",
-      "t.mintOk": "铸造成功",
+      "t.mintOk": "铸造成功，代币已到账",
       "t.mintFail": "铸造失败",
       "t.genFirst": "请先生成指令",
       "t.genCopied": "指令已复制，发给你的 AI 代理即可",
@@ -322,7 +323,8 @@
       "wc.needInfo": "On-chain params not loaded yet, please retry",
       "tx.mint": "Mint tx",
       "tx.approve": "Approve tx",
-      "tx.gas": "gas",
+      "tx.gas": "Gas",
+      "tx.detail": "Transaction details",
       "cmd.body.legacy": `I have a Binance Agentic Wallet. Please mint {name} for me on BSC (binanceChainId {chain}).
 My wallet address: {addr}{idLine}
 
@@ -442,7 +444,7 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "t.approving": "Approving USDT…",
       "t.approveOk": "Approval confirmed",
       "t.minting": "Mint transaction submitted, waiting…",
-      "t.mintOk": "Mint succeeded",
+      "t.mintOk": "Mint succeeded, tokens received",
       "t.mintFail": "Mint failed",
       "t.genFirst": "Generate the command first",
       "t.genCopied": "Command copied — paste it to your AI agent",
@@ -508,7 +510,7 @@ If preview reports "execution reverted":
   const LANG_KEY = "agt_lang_v2";
 
   let LANG = localStorage.getItem(LANG_KEY);
-  if (LANG !== "zh" && LANG !== "en") LANG = "en"; // 默认英文
+  if (LANG !== "zh" && LANG !== "en") LANG = "zh"; // 默认中文
 
   function t(key, vars) {
     let s = (I18N[LANG] && I18N[LANG][key]) || (I18N.zh[key] && I18N.zh[key]) || key;
@@ -1369,7 +1371,15 @@ If preview reports "execution reverted":
       await waitAgenticConfirm(qrCodeId);
     } catch (e) {
       clearAgenticLogin();
-      closeQr(); connMsg("Agentic Wallet 连接失败：" + (e.message || e), true); toast(e.message || "连接失败", "err");
+      closeQr();
+      const msg = (e && e.message) || String(e);
+      const netFail = /load failed|failed to fetch|networkerror|network error/i.test(msg);
+      if (netFail) {
+        const hint = "Agentic 服务在当前环境无法访问（常见于钱包内置浏览器拦截跨域请求）。请改用「浏览器钱包」连接，或在普通浏览器（Safari / Chrome）中打开本页后再连 Agentic。";
+        connMsg(hint, true); toast("请改用「浏览器钱包」", "err");
+      } else {
+        connMsg("Agentic Wallet 连接失败：" + msg, true); toast(msg, "err");
+      }
     }
   }
   let agenticProvider = null;
@@ -1582,6 +1592,7 @@ If preview reports "execution reverted":
     const cAddr = ethers.getAddress($("contract").value.trim());
     const uAddr = ethers.getAddress($("usdt").value.trim());
     const wtx = $("wtx");
+    let approveHash = null;
 
     try {
       // 1) 授权（额度够就跳过）
@@ -1594,6 +1605,7 @@ If preview reports "execution reverted":
           data: "0x095ea7b3" + ethers.AbiCoder.defaultAbiCoder().encode(["address", "uint256"], [cAddr, maxCost]).slice(2),
         });
         await tx1.wait();
+        approveHash = tx1.hash;
         toast(t("t.approveOk"), "ok");
         if (wtx) wtx.innerHTML = txLink(t("tx.approve"), tx1.hash);
       }
@@ -1616,11 +1628,15 @@ If preview reports "execution reverted":
       toast(t("t.mintOk"), "ok");
       if (wtx) {
         wtx.className = "hint tx-success";
-        wtx.innerHTML =
-          hashes
-            .map((h, i) => `<div class="tx-row">✅ ${times > 1 ? t("tx.mint") + " " + (i + 1) : t("tx.mint")}：<a href="https://bscscan.com/tx/${h}" target="_blank" rel="noopener">${shortAddr(h)}</a></div>`)
-            .join("") +
-          `<div class="tx-gas">⛽ ${t("tx.gas")}: ${gasUsed}</div>`;
+        let rows = "";
+        if (approveHash) {
+          rows += `<div class="tx-row">🔓 ${t("tx.approve")}：<a href="https://bscscan.com/tx/${approveHash}" target="_blank" rel="noopener">${shortAddr(approveHash)}</a></div>`;
+        }
+        rows += hashes
+          .map((h, i) => `<div class="tx-row">✅ ${times > 1 ? t("tx.mint") + " " + (i + 1) : t("tx.mint")}：<a href="https://bscscan.com/tx/${h}" target="_blank" rel="noopener">${shortAddr(h)}</a></div>`)
+          .join("");
+        rows += `<div class="tx-gas">⛽ ${t("tx.gas")}: ${gasUsed}</div>`;
+        wtx.innerHTML = `<div class="tx-title">${t("tx.detail")}</div>` + rows + `<div class="tx-ok">✅ ${t("t.mintOk")}</div>`;
       }
       loadInfo().catch(() => {});
     } catch (e) {
