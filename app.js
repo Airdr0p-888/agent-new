@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0xAEB93Ec78A3728cbB6D93B405055705B95F4cF35",
+    CONTRACT: "0x719D3d273792bDcd43550B9abc68a573Fa04cf33",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
     BSCSCAN_API_KEY: "", // 留空走链上分段查询；填入 BscScan 免费 API Key 则走 BscScan（更快、不限区块）
@@ -111,7 +111,7 @@
 本次共 {count} 份 = {costText} USDT，预计得到 {totalText} {name}。
 注意：绝不能直接把 USDT 转到 mint 合约，必须 approve 后调用 mint；只有 {cAddr} 收款。`,
       "hero.title": "持有币安 <em>Agent ID</em> 才能铸造",
-      "hero.sub": "每次 <b>{price}</b> USDT 换 <b>{perMint}</b> 枚 {symbol}，单地址上限 <b>{limit}</b> 次。<br />下面填地址 → 自动检查资格 → 复制指令发给你的 AI 代理即可。",
+      "hero.sub": "每次 <b>{price}</b> USDT 换 <b>{perMint}</b> 枚 {symbol}，单地址上限 <b>{limit}</b> 次。",
       "hero.loading": "正在读取链上参数…",
       "prog.title": "Mint 进度",
       "prog.loading": "读取中…",
@@ -224,12 +224,12 @@
       "sec.liquidity": "开盘动作",
       "sec.liquidityV": "等值代币 + 募集 USDT 注入 PancakeSwap V2 交易对",
       "sec.summaryTitle": "AI 概括",
-      "sec.summary": "{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（{cap} 份）。每份支付 {price} USDT 获得 {perMint} 枚代币；开盘时，合约将等值代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，涉及交易对的转账收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP）。",
+      "sec.summary": "{sym} 是固定配置的 ERC20，铸造阶段受指定 Agent ID NFT 持有门槛限制且有硬顶（{cap} 份）。每份支付 {price} USDT 获得 {perMint} 枚代币；开盘时，合约将等值代币及募集到的 USDT 注入 PancakeSwap V2 交易对。开盘后，买入收取 3% 手续费（1% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP），卖出收取 5% 手续费（3% 销毁进黑洞 + 1% 持币分红以 USDT 发放 + 1% 回流自动加 LP）。",
       "sec.taxTitle": "AI 税收检测",
       "sec.t1": "买入税：3%（1% 销毁 + 1% 分红 + 1% LP）",
-      "sec.t2": "卖出税：3%（1% 销毁 + 1% 分红 + 1% LP）",
+      "sec.t2": "卖出税：5%（3% 销毁 + 1% 分红 + 1% LP）",
       "sec.t3": "转账税：0%",
-      "sec.t4": "单钱包最大量：每地址基础 10 份 mint shares，每成功推荐 1 位已铸造者 +1 份；开盘后无持币上限",
+
       "sec.note": "以上为合约机制说明；铸造前请在 BscScan 自行核验合约源码。",
 
       "cmd.body": `我有币安 Agentic Wallet，请在 BSC（binanceChainId {chain}）铸造 {name}。{idLine}
@@ -338,7 +338,7 @@ Tx 1: approve {amountText} USDT to the {name} contract (skip if allowance is alr
 Total: {count} shares = {costText} USDT, expected {totalText} {name}.
 Important: never transfer USDT directly to the mint contract. Always approve then call mint. {cAddr} is the only address that accepts payment.`,
       "hero.title": "Only Binance <em>Agent ID</em> holders can mint",
-      "hero.sub": "Each mint costs <b>{price}</b> USDT for <b>{perMint}</b> {symbol}, max <b>{limit}</b> per wallet.<br />Enter your address → auto-check eligibility → copy the command to your AI agent.",
+      "hero.sub": "Each mint costs <b>{price}</b> USDT for <b>{perMint}</b> {symbol}, max <b>{limit}</b> per wallet.",
       "hero.loading": "Loading on-chain parameters…",
       "prog.title": "Mint progress",
       "prog.loading": "Loading…",
@@ -451,12 +451,12 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "sec.liquidity": "At launch",
       "sec.liquidityV": "equal minted tokens + raised USDT injected into the PancakeSwap V2 pair",
       "sec.summaryTitle": "AI Summary",
-      "sec.summary": "{sym} is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap ({cap} shares). Each share pays {price} USDT for {perMint} tokens; at launch the contract injects an equal amount of minted tokens and the raised USDT into the PancakeSwap V2 pair. After launch, transfers involving the pair incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP).",
+      "sec.summary": "{sym} is a fixed-config ERC20; the mint phase is gated by holding a specified Agent ID NFT and has a hard cap ({cap} shares). Each share pays {price} USDT for {perMint} tokens; at launch the contract injects an equal amount of minted tokens and the raised USDT into the PancakeSwap V2 pair. After launch, buys incur a 3% fee (1% burn to the dead address + 1% USDT holder dividend + 1% auto-LP) and sells incur a 5% fee (3% burn to the dead address + 1% USDT holder dividend + 1% auto-LP).",
       "sec.taxTitle": "AI Tax Check",
       "sec.t1": "Buy tax: 3% (1% burn + 1% dividend + 1% LP)",
-      "sec.t2": "Sell tax: 3% (1% burn + 1% dividend + 1% LP)",
+      "sec.t2": "Sell tax: 5% (3% burn + 1% dividend + 1% LP)",
       "sec.t3": "Transfer tax: 0%",
-      "sec.t4": "Per-wallet cap: 10 mint shares base per address, +1 per successfully referred minter; no post-launch token balance limit",
+
       "sec.note": "Mechanism description above — verify the contract source on BscScan before minting.",
 
       "cmd.body": `I have a Binance Agentic Wallet. Mint {name} on BSC (binanceChainId {chain}).{idLine}
