@@ -232,35 +232,28 @@
       "sec.t4": "单钱包最大量：每地址基础 10 份 mint shares，每成功推荐 1 位已铸造者 +1 份；开盘后无持币上限",
       "sec.note": "以上为合约机制说明；铸造前请在 BscScan 自行核验合约源码。",
 
-      "cmd.body": `我有币安 Agentic Wallet，请在 BSC（binanceChainId {chain}）上帮我铸造 {name}。{idLine}
+      "cmd.body": `我有币安 Agentic Wallet，请在 BSC（binanceChainId {chain}）铸造 {name}。{idLine}
 
 规则：
-- 使用你当前默认连接的 Agentic Wallet（\`baw wallet settings\` 显示的那个）发起所有交易，无需我提供地址，也不要改成别的地址。
-- 先运行 \`baw wallet settings --json\`，确认 devMode.enabled 为 true、且当前钱包就是你的 Agentic Wallet。
-- 每笔交易都按「preview → 把解析结果和风险给我看 → 等我确认 → \`baw contract-call execute --requestId <这次 preview 返回的 requestId> --json\`」执行。
-- gas 预估加 20%。
-- 上一笔在链上确认成功后，再开始下一笔。
+- 用默认 Agentic Wallet（\`baw wallet settings\` 显示的那个）发起全部交易，不要改地址。
+- 先跑 \`baw wallet settings --json\`，确认 devMode.enabled=true 且是当前钱包。
+- 每笔：preview → 给我看解析与风险 → 等我确认 → \`baw contract-call execute --requestId <preview返回的requestId> --json\`。gas +20%，上一笔确认后再下一笔。
+- 每次执行前重新读链上状态，严禁复用旧参数。
 
-【执行前必做 · 每次都重新读取链上状态，严禁直接复用上次生成的参数】
-1) 读取合约当前状态（用 ethers 读合约，或让 baw 读）：
-   - launched() 必须为 false（mint 阶段 / 未开盘），否则 mint 会 revert；开盘后不能再 mint，请停下来告诉我「mint 已结束」。
-   - PRICE() 当前单价、MAX_PER_WALLET() 与 mintedBy(<你的钱包地址>) 看剩余可铸额度。
-   - 用 AGENT_ID() 指向的注册表（或 SPACE ID 注册表 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F 的 ownerOf(namehash("你的.agent.id"))）确认【当前这个 Agentic Wallet 地址】确实持有 .ai Agent ID。若持有者不是当前钱包，mint 必然 revert —— 请改用持有 Agent ID 的那个钱包，并告诉我。
-2) 用【刚刚读到的 PRICE()】重算：cost = PRICE × {count}；maxCost = cost × 1.1（留 10% 余量，防价格随铸造推进上涨）。若与下面写死的 maxCost 不一致，用新值重新生成下面两笔的调用数据后再 preview，不要沿用旧参数。
+铸前检查（每次执行前重新读链上状态，严禁复用旧参数）：
+1) launched() 必须为 false（已开盘则停下告诉我「mint 已结束」）；读 PRICE()、MAX_PER_WALLET()、mintedBy(你的地址) 算剩余额度。
+2) 用 ownerOf(namehash("你的.agent.id")) 确认当前钱包持有 .ai Agent ID（不持有则停下告诉我）。
+3) 按实时 PRICE 重算：cost=PRICE×{count}，maxCost=cost×1.1（约 {costText} {paySymbol}）；与下文不符就重生成调用数据。
 
-{approveBlock}{mintStepLabel}：调用 mint 合约的 mint(uint256 shares, address referrer, uint256 maxCost)，一次性买 {count} 份（全部份数一笔完成，不要拆成多次）
+{approveBlock}{mintStepLabel}：mint(uint256 shares, address referrer, uint256 maxCost)，一次性买 {count} 份
   shares   = {count}
-  referrer = {ref}（邀请机制已移除，这里传零地址）
-  maxCost  = 见上方重算值（实际花费约 {costText} {paySymbol}）
+  referrer = {ref}（零地址）
+  maxCost  = 见上方重算（约 {costText} {paySymbol}）
   合约: {cAddr}
   调用数据: {mintData}
   baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData}{mintValueArg} --json
 
-若 preview 报 execution reverted：
-- 先读 revert 原因（如 maxCost too low / not launched / not eligible / cap reached）。
-- 若是 maxCost 不够，用最新 PRICE 提高 maxCost 后重新生成调用数据再 preview（这属于按链上状态重算，不是盲目重试）。
-- 若是 not eligible，说明当前钱包不持有 Agent ID，停下来告诉我。
-- {payNote}`,
+若 preview reverted：读原因（maxCost too low / not launched / not eligible / cap reached）。maxCost 不够用新 PRICE 提高重算；not eligible 表示该钱包无 Agent ID，停下告诉我。{payNote}`,
     },
 
     en: {
@@ -466,35 +459,28 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "sec.t4": "Per-wallet cap: 10 mint shares base per address, +1 per successfully referred minter; no post-launch token balance limit",
       "sec.note": "Mechanism description above — verify the contract source on BscScan before minting.",
 
-      "cmd.body": `I have a Binance Agentic Wallet. Please mint {name} for me on BSC (binanceChainId {chain}).{idLine}
+      "cmd.body": `I have a Binance Agentic Wallet. Mint {name} on BSC (binanceChainId {chain}).{idLine}
 
 Rules:
-- Use your currently connected Agentic Wallet (the one shown by \`baw wallet settings\`) for all transactions. Do not ask me for an address and do not change it.
-- First run \`baw wallet settings --json\` and confirm devMode.enabled is true and the current wallet is your Agentic Wallet.
-- For every transaction: preview → show me the parsed result and risks → wait for my confirmation → \`baw contract-call execute --requestId <requestId from that preview> --json\`.
-- Add 20% to the gas estimate.
-- Only start the next transaction after the previous one is confirmed on chain.
+- Use the default Agentic Wallet (the one shown by \`baw wallet settings\`); do not change the address.
+- First run \`baw wallet settings --json\`; confirm devMode.enabled=true and it's the current wallet.
+- Per tx: preview → show me the parsed result and risks → wait for my confirmation → \`baw contract-call execute --requestId <requestId from that preview> --json\`. Add 20% to gas; only start the next tx after the previous one confirms on chain.
+- Re-read on-chain state before every execution; never reuse old parameters.
 
-[Before any transaction — re-read on-chain state every time; never reuse previously generated parameters]
-1) Read the contract's current state (via ethers, or let baw read it):
-   - launched() must be false (mint phase / not launched), otherwise mint reverts; once launched, mint is closed. Stop and tell me "mint ended".
-   - PRICE() (current unit price), MAX_PER_WALLET() and mintedBy(<your wallet address>) to see remaining quota.
-   - Using AGENT_ID()'s registry (or the SPACE ID registry 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F, ownerOf(namehash("your.agent.id"))), confirm that THIS Agentic Wallet address actually holds the .ai Agent ID. If the holder is a different wallet, mint will revert — switch to the wallet that holds the Agent ID and tell me.
-2) Recompute with the PRICE() you just read: cost = PRICE × {count}; maxCost = cost × 1.1 (10% headroom against price steps). If it differs from the maxCost written below, regenerate the calldata for both transactions with the new value before previewing. Do not use stale parameters.
+Pre-mint checks (re-read on-chain state before every execution; never reuse old parameters):
+1) launched() must be false (if launched, stop and tell me "mint ended"); read PRICE(), MAX_PER_WALLET() and mintedBy(<your address>) for remaining quota.
+2) Use ownerOf(namehash("your.agent.id")) to confirm THIS wallet holds the .ai Agent ID (if not, stop and tell me).
+3) Recompute with live PRICE: cost = PRICE × {count}, maxCost = cost × 1.1 (~{costText} {paySymbol}); if it differs from below, regenerate calldata.
 
-{approveBlock}{mintStepLabel}: call mint(uint256 shares, address referrer, uint256 maxCost) on the mint contract — {count} shares in a SINGLE transaction (all shares at once, do NOT split into multiple mints)
+{approveBlock}{mintStepLabel}: mint(uint256 shares, address referrer, uint256 maxCost) on the mint contract — {count} shares in ONE transaction
   shares   = {count}
-  referrer = {ref} (invite mechanism removed; zero address passed here)
-  maxCost  = see recompute above (actual cost ~ {costText} {paySymbol})
+  referrer = {ref} (zero address)
+  maxCost  = see recompute above (~{costText} {paySymbol})
   Contract: {cAddr}
   Input data: {mintData}
   baw contract-call preview --binanceChainId {chain} --to {cAddr} --inputData {mintData}{mintValueArg} --json
 
-If preview reports "execution reverted":
-- Read the revert reason (e.g. maxCost too low / not launched / not eligible / cap reached).
-- If maxCost is too low, raise it using the latest PRICE and regenerate the calldata, then preview again (this is recomputing from chain state, not a blind retry).
-- If not eligible, the current wallet does not hold the Agent ID — stop and tell me.
-- {payNote}`,
+If preview reverted: read the reason (maxCost too low / not launched / not eligible / cap reached). If maxCost too low, raise it with the latest PRICE and recompute; if not eligible, this wallet lacks the Agent ID — stop and tell me. {payNote}`,
     },
   };
 
@@ -642,7 +628,7 @@ If preview reports "execution reverted":
   let account = null;
   let walletProvider = null; // 连上的钱包（注入的或 WalletConnect）
   let wcProvider = null;
-  let selectedCount = 10; // 点选的铸造份数（1–10），默认 10 份
+  let selectedCount = 1; // 点选的铸造份数（1–10），默认 1 份
   let lastCheck = null;
   let resolved = null; // { addr, name }
 
