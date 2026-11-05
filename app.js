@@ -1244,6 +1244,28 @@ If preview reports "execution reverted":
     return "";
   }
 
+  // 把合约/节点返回的英文 revert 原因翻译成中文（已知常见原因做映射，未知则原样返回）
+  function revertCn(msg) {
+    if (!msg) return msg;
+    const s = String(msg);
+    const map = [
+      [/already\s+launched|launched/i, "已开盘，铸造已结束"],
+      [/not\s+launched/i, "尚未开盘，不能铸造"],
+      [/exceed\s+your\s+cap/i, "超出你的铸造上限"],
+      [/cap\s+reached/i, "已达铸造上限"],
+      [/not\s+eligible/i, "资格不符（需持有 Agent ID）"],
+      [/max\s*cost\s*too\s*low|maxcost/i, "最大花费过低（请调高滑点/最大成本）"],
+      [/transfer\s+amount\s+exceeds\s+balance/i, "转账金额超过余额"],
+      [/insufficient\s+(balance|allowance|funds)/i, "余额或授权额度不足"],
+      [/allowance/i, "授权额度不足"],
+      [/balance/i, "余额不足"],
+      [/deadline/i, "已过铸造截止时间"],
+      [/paused/i, "合约已暂停"],
+    ];
+    for (const [re, cn] of map) if (re.test(s)) return cn;
+    return s;
+  }
+
   // 直接打公共 BSC RPC：错误不再被 ethers 包装成 "could not coalesce error"，真实原因直接抛出
   async function rpcCall(method, params) {
     let lastMsg = "";
@@ -1259,8 +1281,8 @@ If preview reports "execution reverted":
       } catch (e) { lastMsg = String((e && e.message) || e); }
     }
     const reason = decodeRevert(lastData);
-    if (reason) throw new Error("合约拒绝: " + reason);
-    if (/revert/i.test(lastMsg)) throw new Error("合约拒绝: " + lastMsg);
+    if (reason) throw new Error("合约拒绝: " + revertCn(reason));
+    if (/revert/i.test(lastMsg)) throw new Error("合约拒绝: " + revertCn(lastMsg));
     throw new Error(method + " 请求失败: " + (lastMsg || "所有 BSC 公共节点均不可用"));
   }
   function agentApiUrl() {
@@ -1643,7 +1665,7 @@ If preview reports "execution reverted":
       // ethers 会把底层错误包装成 "could not coalesce error"，真实原因在 info.error 里，挖出来直接显示
       const nested = e && ((e.info && e.info.error) || e.error);
       const real = (nested && nested.message) || e.shortMessage || e.reason || e.message || t("t.mintFail");
-      fail(String(real));
+      fail(revertCn(String(real)));
     }
   }
 
