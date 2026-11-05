@@ -17,7 +17,7 @@
 
   // ====== 新版本配置（部署后把 CONTRACT 改成真实地址即可，其余已固定）======
   const CONFIG = {
-    CONTRACT: "0x719D3d273792bDcd43550B9abc68a573Fa04cf33",
+    CONTRACT: "0xd40473d65Bd6627BAD372506F6454B82a3ca343F",
     USDT: "0x55d398326f99059fF775485246999027B3197955",     // BSC USDT
     AGENT_ID_NFT: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
     BSCSCAN_API_KEY: "", // 留空走链上分段查询；填入 BscScan 免费 API Key 则走 BscScan（更快、不限区块）
