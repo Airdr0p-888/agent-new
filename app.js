@@ -504,7 +504,7 @@ If preview reverted: read the reason (maxCost too low / not launched / not eligi
     return s;
   }
 
-  let heroVals = { price: "1", perMint: "50,000,000", symbol: "火星币", limit: "10", cap: "10,000" };
+  let heroVals = { price: "10", perMint: "50,000,000", symbol: "火星币", limit: "10", cap: "10,000" };
   let heroReady = false; // 是否已拿到真实参数（链上读到的或本地缓存的）
 
   // 上次读到的参数缓存，按合约地址存，刷新时先渲染它，避免先显示默认值再跳变
