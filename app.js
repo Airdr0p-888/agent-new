@@ -220,7 +220,7 @@
       "sec.scoreLabel": "风险评分",
       "sec.badges": "高危 0 · 中危 0 · 提示 2",
       "sec.contract": "合约",
-      "sec.creator": "创建者 / 拥有者",
+
       "sec.liquidity": "开盘动作",
       "sec.liquidityV": "等值代币 + 募集 USDT 注入 PancakeSwap V2 交易对",
       "sec.summaryTitle": "AI 概括",
@@ -447,7 +447,7 @@ Important: never transfer USDT directly to the mint contract. Always approve the
       "sec.scoreLabel": "Risk score",
       "sec.badges": "High 0 · Medium 0 · Info 2",
       "sec.contract": "Contract",
-      "sec.creator": "Creator / Owner",
+
       "sec.liquidity": "At launch",
       "sec.liquidityV": "equal minted tokens + raised USDT injected into the PancakeSwap V2 pair",
       "sec.summaryTitle": "AI Summary",
