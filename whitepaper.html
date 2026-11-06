@@ -75,7 +75,7 @@
       <h3>2. 四大核心设计</h3>
       <div class="pillars">
         <div class="pillar"><b>100% 进 LP</b><span>每一笔铸造资金全部进入流动性底池，不抽成、不进金库。</span></div>
-        <div class="pillar"><b>3% 税费（销毁+分红+LP）</b><span>买入 / 卖出各收取 3% 税费：1% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP（开盘 LP 打入黑洞）。</span></div>
+        <div class="pillar"><b>买 3% / 卖 5% 税费（销毁+分红+LP）</b><span>买入收取 3% 税费：1% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP；卖出收取 5% 税费：3% 销毁进黑洞、1% 持币分红以 USDT 发放、1% 自动加 LP（开盘 LP 打入黑洞）。</span></div>
         <div class="pillar"><b>LP 永久锁仓</b><span>流动性代币自动锁入黑洞地址（0xdead），永久锁定，任何人都无法撤出。</span></div>
         <div class="pillar"><b>零提取权限</b><span>合约不包含任何提款 / owner 函数，开发团队无法动用池内资产。</span></div>
       </div>
@@ -84,14 +84,14 @@
       <ul>
         <li>名称 / 符号：火星币 / 火星币，18 位小数，BEP-20 标准。</li>
         <li>总供应量仅在铸造时产生，硬上限由代币合约强制执行。</li>
-        <li>买入税 3%、卖出税 3%，写死在合约代码中：1% 销毁、1% 持币分红（USDT）、1% 回流自动加 LP。</li>
+        <li>买入税 3%、卖出税 5%，写死在合约代码中：买入为 1% 销毁 / 1% 持币分红（USDT）/ 1% 回流自动加 LP；卖出为 3% 销毁 / 1% 持币分红（USDT）/ 1% 回流自动加 LP。</li>
         <li>铸造阶段（开盘前）火星币 不可转账；由 owner 在打满前手动开盘（launch）：合约把募集的 USDT 与等值的已铸代币注入 PancakeSwap V2 建立流动性，未售出的剩余代币留在黑洞等效销毁，随后丢弃权限（renounce）、LP 打入黑洞并解除转账锁定。注意：打满后黑洞已无剩余代币，若此时才开盘将不会建立流动性，务必在打满前开盘。</li>
       </ul>
 
       <h3>4. 铸造</h3>
       <ul>
         <li>资格：发起交易的钱包必须持有 <code>.ai</code> Agent ID（链上读取 SPACE ID 注册表）。</li>
-        <li>额度：每个 Agent ID 10 份；每笔交易最多 10 份。</li>
+        <li>额度：每个 Agent ID 1 份；每份 10 USDT。</li>
         <li>支付：用 USDT（先 approve 授权，再带最高成本 maxCost 调用 mint）即可。</li>
         <li>铸造资金 100% 进入 LP 底池，LP 代币发射后自动打入黑洞、永久锁定。</li>
       </ul>
@@ -129,7 +129,7 @@
       <h3>4. Minting</h3>
       <ul>
         <li>Eligibility: the sending wallet must hold a <code>.ai</code> Agent ID (read on-chain from the SPACE ID registry).</li>
-        <li>Quota: 10 shares per Agent ID; max 10 shares per transaction.</li>
+        <li>Quota: 1 share per Agent ID; 10 USDT per share.</li>
         <li>Pay with USDT (approve, then mint with a maximum cost maxCost).</li>
         <li>100% of every mint goes into the LP pool; LP tokens are auto-sent to the burn address (0xdead) at launch.</li>
       </ul>
